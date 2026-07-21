@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简历工坊 Resume Forge — 校招简历在线制作</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='20' height='26' rx='2' fill='%23FDFDFB' stroke='%2317503F' stroke-width='2'/%3E%3Cpath d='M10 10h12M10 15h12M10 20h8' stroke='%2317503F' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='23' r='5' fill='%23B3402A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/templates.css">
+<link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">简</span>
+      <div class="brand-text">
+        <strong>简历工坊</strong>
+        <span class="brand-en">RESUME&nbsp;FORGE</span>
+      </div>
+    </div>
+
+    <div class="topbar-group draft-group">
+      <select id="draft-select" class="draft-select" aria-label="选择草稿"></select>
+      <button class="icon-btn" id="btn-draft-new" title="新建空白草稿">＋</button>
+      <button class="icon-btn" id="btn-draft-copy" title="复制当前草稿">⧉</button>
+      <button class="icon-btn" id="btn-draft-rename" title="重命名">✎</button>
+      <button class="icon-btn danger" id="btn-draft-delete" title="删除草稿">✕</button>
+    </div>
+
+    <div class="topbar-group topbar-right">
+      <span class="save-status" id="save-status" title="自动保存状态">
+        <i class="save-dot" id="save-dot"></i>
+        <span class="save-text mono" id="save-text">未保存</span>
+      </span>
+      <button class="btn ghost" id="btn-guide">写作指南</button>
+      <button class="btn ghost" id="btn-fill-demo">填入示例</button>
+      <button class="btn ghost" id="btn-export-json">导出 JSON</button>
+      <button class="btn ghost" id="btn-import-json">导入 JSON</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+      <button class="btn stamp" id="btn-export-pdf">导出 PDF</button>
+    </div>
+  </header>
+
+  <div class="mobile-switch" id="mobile-switch">
+    <button class="seg-btn active" data-view="edit">编辑</button>
+    <button class="seg-btn" data-view="preview">预览</button>
+  </div>
+
+  <main class="workbench">
+    <aside class="form-pane" id="form-pane">
+      <div class="card checklist-card" id="checklist-card"></div>
+      <div id="form-sections"></div>
+    </aside>
+
+    <section class="preview-pane">
+      <div class="preview-toolbar">
+        <div class="toolbar-block">
+          <span class="toolbar-label mono">模板</span>
+          <div class="segmented" id="tpl-switch">
+            <button class="seg-btn active" data-tpl="modern">简约单栏</button>
+            <button class="seg-btn" data-tpl="classic">经典双栏</button>
+            <button class="seg-btn" data-tpl="academic">学术深造</button>
+          </div>
+        </div>
+        <div class="toolbar-block">
+          <span class="toolbar-label mono">配色</span>
+          <div class="swatches" id="theme-swatches"></div>
+        </div>
+        <div class="toolbar-block">
+          <span class="toolbar-label mono">密度</span>
+          <div class="segmented" id="density-switch">
+            <button class="seg-btn" data-density="compact">紧凑</button>
+            <button class="seg-btn active" data-density="standard">标准</button>
+            <button class="seg-btn" data-density="relaxed">宽松</button>
+          </div>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <div class="toolbar-block">
+          <button class="icon-btn" id="btn-zoom-out" title="缩小">−</button>
+          <span class="mono zoom-readout" id="zoom-readout">适配</span>
+          <button class="icon-btn" id="btn-zoom-in" title="放大">＋</button>
+          <button class="icon-btn" id="btn-zoom-fit" title="适配窗口">⛶</button>
+        </div>
+        <span class="page-badge mono" id="page-badge">1 页 · A4</span>
+      </div>
+
+      <div class="preview-stage" id="preview-stage">
+        <div class="sheet-wrap" id="sheet-wrap">
+          <div class="sheet tpl-modern density-standard" id="resume-sheet"></div>
+          <div class="fold-flag" id="fold-flag" hidden></div>
+        </div>
+      </div>
+      <div class="sheet-measure tpl-modern density-standard" id="sheet-measure" aria-hidden="true"></div>
+    </section>
+  </main>
+</div>
+
+<aside class="guide-drawer" id="guide-drawer" aria-label="简历写作指南">
+  <header class="guide-head">
+    <div>
+      <h2>简历写作指南</h2>
+      <span class="mono guide-sub">校招 · 实习 · 保研</span>
+    </div>
+    <button class="icon-btn" id="btn-guide-close" title="关闭">✕</button>
+  </header>
+  <div class="guide-body">
+    <details class="guide-item" open>
+      <summary><span class="mono guide-num">01</span>一页纸原则</summary>
+      <div class="guide-content">
+        <p>校招简历坚持<strong>一张 A4 纸</strong>。HR 筛选一份简历平均只用 6–10 秒，两页意味着第二页大概率不会被看到。</p>
+        <p>内容取舍标准：与目标岗位相关的经历详写，不相关的（如应聘开发时的家教经历）一笔带过或直接删掉。荣誉只保留含金量最高的 3–5 项。</p>
+      </div>
+    </details>
+    <details class="guide-item" open>
+      <summary><span class="mono guide-num">02</span>STAR + 动宾 + 量化</summary>
+      <div class="guide-content">
+        <p>每条经历用<strong>「动词 + 做了什么 + 通过什么方法 + 量化结果」</strong>的句式：</p>
+        <div class="guide-compare">
+          <p class="bad">✗ 负责社团公众号运营</p>
+          <p class="good">✓ 负责社团公众号运营，通过策划 12 场裂变活动与栏目改版，6 个月内粉丝从 0 增长至 8000+（+400%），篇均阅读量提升 3 倍</p>
+        </div>
+        <p>量化维度：数量、百分比、金额、时间周期、覆盖人次、排名。没有精确数字就用量级（近百人、数十场）。</p>
+      </div>
+    </details>
+    <details class="guide-item">
+      <summary><span class="mono guide-num">03</span>倒序与时间线</summary>
+      <div class="guide-content">
+        <p>所有经历<strong>最近的写在最前面</strong>。时间格式统一用「2025.06 – 2025.09」。</p>
+        <p>超过 3 个月的空窗期要能解释（备考、休学创业等），面试时主动说明比被追问更好。</p>
+      </div>
+    </details>
+    <details class="guide-item">
+      <summary><span class="mono guide-num">04</span>岗位匹配：照镜子</summary>
+      <div class="guide-content">
+        <p>投递前把 JD（岗位描述）里的关键词圈出来，简历用<strong>同样的词汇</strong>回应。JD 写「熟悉 Vue」，你就不要只写「会前端」。</p>
+        <p>不同岗位准备不同版本：技术岗突出项目与技术栈，运营岗突出数据与活动，一份简历投所有岗位是大忌。</p>
+      </div>
+    </details>
+    <details class="guide-item">
+      <summary><span class="mono guide-num">05</span>动词开头词库</summary>
+      <div class="guide-content">
+        <p class="verb-cloud">主导 · 搭建 · 优化 · 落地 · 策划 · 重构 · 推动 · 迭代 · 制定 · 整合 · 孵化 · 复盘 · 拉通 · 沉淀 · 赋能 · 攻坚</p>
+        <p>开头永远用动词，避免「我」「我们」「负责了」这类弱开头。「参与」显得被动，换成具体承担的部分。</p>
+      </div>
+    </details>
+    <details class="guide-item">
+      <summary><span class="mono guide-num">06</span>常见减分项</summary>
+      <div class="guide-content">
+        <ul>
+          <li>自我评价写空话（「吃苦耐劳、团队精神」）——要么用一句话给出证据，要么不写</li>
+          <li>照片用自拍/滤镜照——要正式证件照，或干脆不放</li>
+          <li>错别字与标点混用（中英文标点混杂）</li>
+          <li>文件名是「简历.pdf」——用「姓名-学校-应聘岗位.pdf」</li>
+          <li>技能用进度条/百分比表示（「PS 80%」没有意义）</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</aside>
+<div class="scrim" id="guide-scrim" hidden></div>
+<div class="toast-host" id="toast-host" aria-live="polite"></div>
+
+<script src="js/schema.js"></script>
+<script src="js/store.js"></script>
+<script src="js/templates.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/checklist.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

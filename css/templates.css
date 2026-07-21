@@ -1,0 +1,368 @@
+/* ==========================================================================
+   templates.css — 简历本体排版（三套模板 × 三档密度 × 六主题）
+   screen 与 print 共用。字体一律本地系统栈，保证导出 PDF 处处一致。
+   ========================================================================== */
+
+/* ----------------------------- 基座 ----------------------------- */
+
+.sheet,
+.sheet-measure {
+  --r-font: "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
+            "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --r-serif: "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+
+  /* 默认主题（藏青），可被 app.js 内联变量覆盖 */
+  --tpl-accent: #1F3A5F;
+  --tpl-accent-soft: #E8EDF4;
+  --tpl-accent-ink: #16283f;
+
+  /* 默认密度 = standard，可被 density-* 覆盖 */
+  --fs-name: 25px;
+  --fs-sub: 14px;
+  --fs-h: 13.5px;
+  --fs-body: 13px;
+  --fs-small: 11px;
+  --lh: 1.55;
+  --pad: 12mm;
+  --sec-gap: 13px;
+  --entry-gap: 8px;
+
+  font-family: var(--r-font);
+  color: #1c1c1c;
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sheet {
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+}
+
+/* ----------------------------- 密度 ----------------------------- */
+
+.density-compact {
+  --fs-name: 22px; --fs-sub: 12.5px; --fs-h: 12.5px; --fs-body: 12px;
+  --fs-small: 10.5px; --lh: 1.45; --pad: 10mm; --sec-gap: 10px; --entry-gap: 6px;
+}
+.density-standard {
+  --fs-name: 25px; --fs-sub: 14px; --fs-h: 13.5px; --fs-body: 13px;
+  --fs-small: 11px; --lh: 1.55; --pad: 12mm; --sec-gap: 13px; --entry-gap: 8px;
+}
+.density-relaxed {
+  --fs-name: 28px; --fs-sub: 15px; --fs-h: 14.5px; --fs-body: 14px;
+  --fs-small: 12px; --lh: 1.7; --pad: 14mm; --sec-gap: 17px; --entry-gap: 10px;
+}
+
+/* ----------------------------- 共享元件 ----------------------------- */
+
+.r-body { padding: var(--pad); }
+
+.r-sec { margin-bottom: var(--sec-gap); }
+.r-sec:last-child { margin-bottom: 0; }
+
+.r-sec-title {
+  font-size: var(--fs-h);
+  font-weight: 700;
+  letter-spacing: .5px;
+  color: var(--tpl-accent-ink);
+  margin-bottom: calc(var(--entry-gap) * 0.9);
+}
+
+.r-entry { margin-bottom: var(--entry-gap); }
+.r-entry:last-child { margin-bottom: 0; }
+
+.r-entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-sub);
+}
+.r-entry-org { font-weight: 700; color: #111; }
+.r-entry-org em {
+  font-style: normal;
+  font-weight: 600;
+  color: #3a3a3a;
+  font-size: var(--fs-body);
+  margin-left: 6px;
+}
+.r-entry-org .r-org-extra {
+  font-style: normal;
+  font-weight: 400;
+  color: #666;
+  font-size: var(--fs-small);
+  margin-left: 8px;
+}
+.r-entry-date {
+  font-size: var(--fs-small);
+  color: #777;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.r-subline {
+  font-size: var(--fs-small);
+  color: #555;
+  margin-top: 1px;
+}
+
+.r-bullets {
+  list-style: none;
+  margin: 3px 0 0;
+  padding: 0;
+}
+.r-bullets li {
+  position: relative;
+  padding-left: 13px;
+  font-size: var(--fs-body);
+  margin-bottom: 2.5px;
+  color: #2a2a2a;
+}
+.r-bullets li::before {
+  content: "▪";
+  position: absolute;
+  left: 1px;
+  top: 0;
+  color: var(--tpl-accent);
+  font-size: .8em;
+  line-height: calc(var(--lh) * 1.25);
+}
+
+.r-photo {
+  width: 24mm;
+  height: 31mm;
+  object-fit: cover;
+  border: 1px solid #d8d8d8;
+  background: #f0f0f0;
+  flex: 0 0 auto;
+}
+
+/* =====================================================================
+   模板一：tpl-modern 简约现代单栏
+   ===================================================================== */
+
+.tpl-modern .r-head {
+  padding: var(--pad) var(--pad) calc(var(--pad) * 0.62);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 2.5px solid var(--tpl-accent);
+}
+.tpl-modern .r-head-left { min-width: 0; }
+.tpl-modern .r-name {
+  font-size: var(--fs-name);
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #111;
+  line-height: 1.2;
+}
+.tpl-modern .r-intent {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--tpl-accent-ink);
+  background: var(--tpl-accent-soft);
+  padding: 2px 10px;
+  border-radius: 3px;
+}
+.tpl-modern .r-contact {
+  margin-top: 7px;
+  font-size: var(--fs-small);
+  color: #555;
+  line-height: 1.7;
+}
+.tpl-modern .r-contact .sep { color: #bbb; margin: 0 5px; }
+.tpl-modern .r-photo { margin-left: 8px; }
+
+.tpl-modern .r-sec-title {
+  padding-left: 9px;
+  border-left: 3.5px solid var(--tpl-accent);
+  line-height: 1.25;
+}
+
+/* 技能块：条目式 */
+.r-skill-items li::before { content: "–"; color: var(--tpl-accent); font-weight: 700; }
+
+/* 荣誉：两栏流式 */
+.r-honors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 18px;
+  row-gap: 3px;
+}
+.r-honor {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: var(--fs-body);
+}
+.r-honor .lv {
+  font-size: var(--fs-small);
+  color: var(--tpl-accent-ink);
+  background: var(--tpl-accent-soft);
+  border-radius: 3px;
+  padding: 0 6px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.r-honor .date { font-size: var(--fs-small); color: #888; white-space: nowrap; }
+
+.r-self {
+  font-size: var(--fs-body);
+  color: #333;
+  text-align: justify;
+}
+
+/* =====================================================================
+   模板二：tpl-classic 经典双栏（左栏 accent 底）
+   ===================================================================== */
+
+.tpl-classic { padding: 0 !important; }
+.tpl-classic .r-grid {
+  display: grid;
+  grid-template-columns: 60mm 1fr;
+  min-height: 297mm;
+}
+.sheet.tpl-classic { height: 297mm; }
+
+/* 左栏 */
+.tpl-classic .r-side {
+  background: var(--tpl-accent);
+  color: #fff;
+  padding: var(--pad) calc(var(--pad) * 0.72);
+}
+.tpl-classic .r-side .r-photo {
+  width: 30mm;
+  height: 39mm;
+  border: 2px solid rgba(255, 255, 255, .75);
+  margin-bottom: 12px;
+}
+.tpl-classic .r-name {
+  font-size: calc(var(--fs-name) * 0.94);
+  font-weight: 800;
+  letter-spacing: 2px;
+  line-height: 1.25;
+}
+.tpl-classic .r-intent {
+  margin-top: 5px;
+  font-size: var(--fs-small);
+  color: rgba(255, 255, 255, .88);
+  letter-spacing: .5px;
+}
+.tpl-classic .r-side .r-sec { margin-bottom: calc(var(--sec-gap) * 1.1); }
+.tpl-classic .r-sec-title.side {
+  color: #fff;
+  font-size: var(--fs-h);
+  padding-bottom: 4px;
+  margin-bottom: 7px;
+  border-bottom: 1.5px solid rgba(255, 255, 255, .35);
+  letter-spacing: 1px;
+}
+.tpl-classic .r-contact-list { list-style: none; margin: 0; padding: 0; }
+.tpl-classic .r-contact-list li {
+  font-size: var(--fs-small);
+  margin-bottom: 5px;
+  line-height: 1.5;
+  word-break: break-all;
+}
+.tpl-classic .r-contact-list .k {
+  display: block;
+  font-size: calc(var(--fs-small) - 1.5px);
+  color: rgba(255, 255, 255, .62);
+  letter-spacing: 1px;
+}
+.tpl-classic .r-side .r-bullets li { color: rgba(255, 255, 255, .95); padding-left: 11px; }
+.tpl-classic .r-side .r-bullets li::before { content: "–"; color: rgba(255, 255, 255, .8); font-weight: 700; }
+.tpl-classic .r-side .r-skill-items li { font-size: var(--fs-small); }
+.tpl-classic .r-side .r-cert { font-size: var(--fs-small); margin-bottom: 3px; padding-left: 11px; position: relative; }
+.tpl-classic .r-side .r-cert::before { content: "✓"; position: absolute; left: 0; color: rgba(255,255,255,.7); font-size: .85em; }
+.tpl-classic .r-side .r-honor-s { font-size: var(--fs-small); margin-bottom: 5px; line-height: 1.45; }
+.tpl-classic .r-side .r-honor-s .date { display: block; font-size: calc(var(--fs-small) - 1.5px); color: rgba(255,255,255,.6); }
+.tpl-classic .r-side .r-honor-s .lv { color: rgba(255,255,255,.75); font-size: calc(var(--fs-small) - 1.5px); margin-left: 4px; }
+.tpl-classic .r-side .r-self { font-size: var(--fs-small); color: rgba(255,255,255,.92); text-align: justify; }
+
+/* 右栏 */
+.tpl-classic .r-main { padding: var(--pad) calc(var(--pad) * 0.95); }
+.tpl-classic .r-main .r-sec-title {
+  color: var(--tpl-accent-ink);
+  padding-bottom: 3px;
+  border-bottom: 1.5px solid var(--tpl-accent-soft);
+}
+
+/* =====================================================================
+   模板三：tpl-academic 学术深造（保研 / 出国）
+   ===================================================================== */
+
+.tpl-academic .r-head {
+  text-align: center;
+  padding: var(--pad) var(--pad) calc(var(--pad) * 0.42);
+  border-bottom: 1.5px solid #222;
+}
+.tpl-academic .r-body { padding-top: calc(var(--pad) * 0.55); }
+.tpl-academic .r-sec { margin-bottom: calc(var(--sec-gap) * 0.72); }
+.tpl-academic .r-name {
+  font-family: var(--r-serif);
+  font-size: var(--fs-name);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #111;
+}
+.tpl-academic .r-head-sub {
+  margin-top: 6px;
+  font-size: var(--fs-small);
+  color: #444;
+  letter-spacing: .5px;
+}
+.tpl-academic .r-contact {
+  margin-top: 4px;
+  font-size: var(--fs-small);
+  color: #555;
+}
+.tpl-academic .r-contact .sep { color: #999; margin: 0 6px; }
+
+.tpl-academic .r-sec-title {
+  font-family: var(--r-serif);
+  text-align: center;
+  letter-spacing: 3px;
+  color: #111;
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999;
+  padding: 2px 0;
+  margin-bottom: calc(var(--entry-gap) * 0.7);
+  font-size: var(--fs-h);
+}
+.tpl-academic .r-sec-title::before { content: none; }
+
+.tpl-academic .r-bullets li::before { content: "–"; color: #555; font-weight: 700; }
+
+/* GPA 高亮行 */
+.tpl-academic .r-gpa-line {
+  font-size: var(--fs-body);
+  margin-top: 2px;
+}
+.tpl-academic .r-gpa-line strong {
+  color: var(--tpl-accent-ink);
+  font-variant-numeric: tabular-nums;
+}
+.tpl-academic .r-courses {
+  font-size: var(--fs-small);
+  color: #555;
+  margin-top: 2px;
+}
+
+/* 论文题录 */
+.tpl-academic .r-paper { margin-bottom: 6px; font-size: var(--fs-body); }
+.tpl-academic .r-paper .t { font-weight: 700; color: #111; }
+.tpl-academic .r-paper .venue { font-style: italic; color: #333; }
+.tpl-academic .r-paper .note {
+  font-size: var(--fs-small);
+  color: var(--tpl-accent-ink);
+  margin-left: 4px;
+}
+.tpl-academic .r-paper .date { font-size: var(--fs-small); color: #888; float: right; }
+
+/* 荣誉列表（学术：单列紧凑） */
+.tpl-academic .r-honors { grid-template-columns: 1fr; row-gap: 2px; }

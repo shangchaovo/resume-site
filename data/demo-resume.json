@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "meta": { "id": "d_demo01", "name": "示例：陈晓雨 · 前端校招", "createdAt": "2026-07-21T10:00:00.000Z", "updatedAt": "2026-07-21T10:00:00.000Z" },
+  "settings": {
+    "template": "modern",
+    "theme": "navy",
+    "density": "standard",
+    "hiddenSections": []
+  },
+  "resume": {
+    "basics": {
+      "name": "陈晓雨",
+      "phone": "13800138000",
+      "email": "chenxiaoyu@example.edu.cn",
+      "wechat": "cxy_dev2026",
+      "city": "杭州",
+      "jobIntent": "前端开发工程师（2026 届校招）",
+      "birthYear": "2003",
+      "politicalStatus": "共青团员",
+      "photo": ""
+    },
+    "education": [
+      {
+        "id": "e_1",
+        "school": "浙江大学",
+        "degree": "本科",
+        "major": "计算机科学与技术",
+        "start": "2022.09",
+        "end": "2026.06",
+        "gpa": "3.8 / 4.0",
+        "rank": "前 10%",
+        "courses": "数据结构、操作系统、计算机网络、数据库系统、Web 开发、软件工程"
+      }
+    ],
+    "internships": [
+      {
+        "id": "i_1",
+        "company": "字节跳动",
+        "role": "前端开发实习生",
+        "city": "杭州",
+        "start": "2025.07",
+        "end": "2025.10",
+        "bullets": [
+          "负责创作者后台数据看板迭代，基于 Vue 3 + ECharts 重构 6 个核心图表组件，首屏渲染耗时从 2.4s 降至 0.9s（-62%）",
+          "搭建前端埋点 SDK 的可视化校验工具，覆盖 40+ 埋点位，联调阶段埋点缺陷发现率提升 3 倍，节省 QA 回归约 8 人日/版本",
+          "推动团队落地组件级单元测试规范，新增 120+ 用例，核心模块行覆盖率从 34% 提升至 81%"
+        ]
+      },
+      {
+        "id": "i_2",
+        "company": "网易",
+        "role": "Web 开发实习生",
+        "city": "杭州",
+        "start": "2024.07",
+        "end": "2024.09",
+        "bullets": [
+          "参与云音乐活动页开发，独立完成 3 个 H5 活动页（累计 PV 120 万+），封装通用分享/回流组件被 5 个项目复用",
+          "优化活动页图片加载策略（WebP + 懒加载 + CDN 裁剪），移动端 LCP 从 3.1s 降至 1.4s"
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "id": "p_1",
+        "name": "CampusBoard — 校园二手交易小程序",
+        "role": "项目负责人 / 前端",
+        "link": "github.com/chenxy/campusboard",
+        "start": "2025.03",
+        "end": "2025.06",
+        "bullets": [
+          "主导产品从 0 到 1 落地：技术选型（Taro + React）、目录规范与 CI 搭建，4 人团队 3 个月上线",
+          "实现 IM 私聊模块（WebSocket + 本地消息队列），支撑日均 3000+ 条消息收发，离线消息到达率 99.2%",
+          "上线 2 个月积累校内注册用户 6800+，周活 2100+，获校「互联网+」创业赛二等奖"
+        ]
+      }
+    ],
+    "campus": [
+      {
+        "id": "c_1",
+        "org": "校学生科协技术部",
+        "role": "副部长",
+        "start": "2023.09",
+        "end": "2024.06",
+        "bullets": [
+          "策划 12 场技术分享与 Workshop（覆盖 1500+ 人次），牵头搭建科协官网，学期访问量 2.3 万+",
+          "主导招新流程线上化，报名表单系统替代纸质流程，纳新转化率提升 25%"
+        ]
+      }
+    ],
+    "skills": {
+      "items": [
+        "熟练掌握 HTML / CSS / JavaScript（ES2022），理解原型链、事件循环与渲染原理",
+        "熟练使用 Vue 3 全家桶与 React，独立完成过 3 个中型项目，了解 Vite 工程化与性能优化",
+        "熟悉 Node.js / Express，能独立搭建 BFF 层与 CLI 工具；了解 Docker 基础与 CI/CD 流程"
+      ],
+      "certificates": ["CET-6（586 分）", "软件设计师（软考中级）"],
+      "language": "英语 CET-6（586），可流畅阅读英文技术文档与 RFC"
+    },
+    "honors": [
+      { "id": "h_1", "title": "国家奖学金", "level": "国家级", "date": "2024.11" },
+      { "id": "h_2", "title": "校「互联网+」大学生创业大赛二等奖", "level": "校级", "date": "2025.06" },
+      { "id": "h_3", "title": "ACM 省赛银奖（队内主力）", "level": "省级", "date": "2024.05" }
+    ],
+    "research": [],
+    "papers": [],
+    "selfEvaluation": "两年前端项目经验，独立负责过从 0 到 1 的产品；重视工程规范与性能优化，GitHub 保持月度提交；长期跟进 Vue / Vite 生态，技术博客累计 20+ 篇。"
+  }
+}
