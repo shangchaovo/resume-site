@@ -153,6 +153,13 @@ try:
         m = browser.new_context(viewport={"width": 390, "height": 800})
         mp = m.new_page(); mp.goto(BASE); mp.wait_for_load_state("networkidle"); mp.wait_for_timeout(600)
         check(mp.locator("#mobile-switch").is_visible(), "移动端切换条显示")
+        # 滚到底部：导出按钮(sticky 头)仍可达；信任条静态不浮起遮挡
+        mp.evaluate("window.scrollTo(0, document.body.scrollHeight)"); mp.wait_for_timeout(300)
+        box = mp.locator("#btn-export-pdf").bounding_box()
+        check(box is not None and 0 <= box["y"] <= 800, "移动端滚动后导出按钮仍在视口(sticky)")
+        mp.screenshot(path="/tmp/v2_mobile_scroll.png")
+        check(mp.evaluate("getComputedStyle(document.querySelector('.trust-strip')).position") == "static", "信任条静态页脚(不遮挡)")
+        mp.evaluate("window.scrollTo(0,0)"); mp.wait_for_timeout(200)
         mp.click('#mobile-switch [data-view="preview"]'); mp.wait_for_timeout(300)
         check(mp.locator(".preview-pane").is_visible() and not mp.locator("#form-pane").is_visible(), "移动端预览视图")
         m.close()

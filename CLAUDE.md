@@ -43,6 +43,7 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 - 简历正文**只用本地系统字体栈**（PingFang SC / Hiragino Sans GB / Microsoft YaHei / Noto Sans CJK SC）。Google Fonts（Bricolage Grotesque / IBM Plex Mono）**只给编辑器 UI**，且必须可静默降级，**绝不能渗透进 `.sheet`** —— 否则导出 PDF 在没装该字体的机器上会变样。
 - 印泥红 `#B3402A` **只**用于「导出 PDF」按钮和警告，别挪作普通强调色（强调用松墨绿 `#17503F` / 各模板 accent）。
 - **`[hidden]` 陷阱**：给已设作者 `display` 的容器（`.workbench` / `.apps-view`）加 `hidden` 属性**不会**隐藏（作者规则盖掉 UA 的 `[hidden]`），必须配 `…[hidden]{display:none!important}`；否则它会盖在别的视图上抢点击（v2 看板上线时就因此踩坑）。
+- **移动端吸顶**：顶栏 + 编辑/预览切换包在 `.sticky-head` 里——桌面 `display:contents`（不破坏 `.app` 的 flex/100vh 布局），移动端 `position:sticky` 整块吸顶；否则长表单一滚，导出 PDF / 视图切换就滚出视野（用户报过「被挡住 / 无法导出」）。底部信任条**必须静态**：移动端表单不是独立滚动容器，`sticky bottom` 会浮起盖住页面底部内容。
 
 **完成度清单**（`checklist.js`）的「页数」规则是**模板感知**的：modern/classic 要求 1 页，academic 放宽到 ≤2 页（保研/出国 CV 本就常 1–2 页）。改这条阈值要同时顾及两套语义。规则若需动态 tip/target，用 `detail(doc)` 返回 `{ok,tip,target}`（hollow、jd 规则用它，比 pass/tip/target 灵活）；`target:'__jd'` 由清单的点击处理器特判——聚焦 `#jd-card textarea`（该面板在 `#form-sections` 之外，`Editor.flashField` 找不到它）。
 

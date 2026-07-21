@@ -56,6 +56,9 @@ body {
 
 /* ----------------------------- Topbar ----------------------------- */
 
+/* 桌面：包装层不生成盒子，保持原 flex 布局；移动端在媒体查询里改为 sticky */
+.sticky-head { display: contents; }
+
 .topbar {
   height: 56px;
   flex: 0 0 56px;
@@ -142,13 +145,10 @@ body {
 }
 .filename-chip .icon-btn { width: 22px; height: 22px; }
 
-/* 表单列底部信任条 */
+/* 表单列底部信任条（静态页脚，不用 sticky，避免在滚动容器外浮起遮挡内容） */
 .trust-strip {
-  position: sticky;
-  bottom: 0;
-  margin: 18px -16px -48px;
-  padding: 10px 16px;
-  background: linear-gradient(180deg, rgba(231, 235, 228, 0), var(--mat) 32%);
+  margin: 18px 0 0;
+  padding: 10px 0;
   color: var(--ink-3);
   font-size: 11px; font-family: var(--font-mono); letter-spacing: .3px;
   text-align: center;
@@ -215,7 +215,7 @@ body {
 
 .form-pane {
   overflow-y: auto;
-  padding: 16px 16px 48px;
+  padding: 16px 16px 20px;
   border-right: 1px solid var(--panel-edge);
   background: linear-gradient(180deg, rgba(253, 253, 251, .55), rgba(253, 253, 251, 0) 220px);
 }
@@ -875,12 +875,20 @@ body {
   .topbar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
   .topbar-right { margin-left: 0; flex-wrap: wrap; }
   .draft-group { border-left: none; padding-left: 0; margin-left: 0; }
+  .sticky-head {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 45;
+    background: var(--mat);
+    box-shadow: 0 2px 8px -4px rgba(31, 36, 32, .28);
+  }
   .mobile-switch {
     display: inline-flex;
     width: calc(100% - 24px);
     margin: 8px 12px;
     padding: 2px;
-    background: rgba(214, 220, 210, .5);
+    background: var(--mat);
     border: 1px solid var(--panel-edge);
     border-radius: var(--radius);
   }
