@@ -20,7 +20,7 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 
 ## Architecture — 跨文件才看得懂的点
 
-**运行时模型**：无打包器、无 ESM。`index.html` 按固定顺序用 `<script>` 加载 `schema → store → templates → editor → preview → checklist → app`；每个文件是 IIFE，向外暴露一个具名全局（`ResumeSchema / Store / Templates / Editor / Preview / Checklist / App`），彼此直接读全局。**改加载顺序或把某文件改成 ESM 会破坏这条链。**
+**运行时模型**：无打包器、无 ESM。`index.html` 按固定顺序用 `<script>` 加载 `schema → contentlib → store → templates → editor → preview → jdmatch → checklist → apps → app`；每个文件是 IIFE，向外暴露一个具名全局（`ResumeSchema / ContentLib / Store / Templates / Editor / Preview / JDMatch / Checklist / Apps / App`），彼此直接读全局。**改加载顺序或把某文件改成 ESM 会破坏这条链。** v2 三模块：`contentlib`（空心句检测 + 分类型示例/动词库）、`jdmatch`（JD 关键词**透明对照**，只给覆盖/缺失，绝不出 ATS 分数）、`apps`（投递看板，自管 `crb:apps`）；`app.js` 另管「编辑器/看板」视图切换、建议文件名复制、信任条接线。
 
 **核心不变量 —— `touch()` vs 文档引用变更**（横跨 `store.js`/`app.js`/`editor.js`）：
 - 打字/改字段调用 `Store.touch()`：`doc` 是**同一对象引用**，`app.js` 的 `change` 监听器据此只做**轻刷新**（重渲染预览 + 清单），**不重建表单** —— 否则输入框会丢焦点。
@@ -37,13 +37,14 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 - 打印：`@page{size:A4;margin:0}`，页边距由 `.sheet` 内 `--pad` 控制；`.sheet{height:auto;min-height:296mm}`（**296 不是 297**，防浮点多出空白页）；`print-color-adjust:exact` 作用在 `.sheet *`（双栏底色/强调色才能跟屏）；条目 `break-inside:avoid`、分区标题 `break-after:avoid`。
 - 用户直接 `⌘P` 时，`beforeprint` → `App.refreshNow()` 同步重渲染，避免打到陈旧 DOM。
 
-**持久化**（`store.js`，命名空间 `crb:`）：`crb:meta`（currentId + 草稿摘要列表）、`crb:draft:<id>`（**每份独立 key**，一份损坏不波及全部）、`crb:ui`（折叠/缩放/手动自查，非关键可丢）、`crb:seeded`（首访种入示例的标记，避免清缓存后又种）。`pagehide`/`visibilitychange` 兜底 flush；`setItem` 抛 `QuotaExceededError` 时提示导出备份（照片上传已先 canvas 压到 ≤400×533 JPEG q0.85）。
+**持久化**（`store.js`，命名空间 `crb:`）：`crb:meta`（currentId + 草稿摘要列表）、`crb:draft:<id>`（**每份独立 key**，一份损坏不波及全部）、`crb:ui`（折叠/缩放/手动自查，非关键可丢）、`crb:seeded`（首访种入示例的标记，避免清缓存后又种）。投递看板用**独立** `crb:apps`（全局数组，不经 `Store.touch`，由 `apps.js` 自管）；卡片引用草稿时快照 `draftName`，避免改名/删草稿后断裂。`pagehide`/`visibilitychange` 兜底 flush；`setItem` 抛 `QuotaExceededError` 时提示导出备份（照片上传已先 canvas 压到 ≤400×533 JPEG q0.85）。
 
 **两条设计纪律**：
 - 简历正文**只用本地系统字体栈**（PingFang SC / Hiragino Sans GB / Microsoft YaHei / Noto Sans CJK SC）。Google Fonts（Bricolage Grotesque / IBM Plex Mono）**只给编辑器 UI**，且必须可静默降级，**绝不能渗透进 `.sheet`** —— 否则导出 PDF 在没装该字体的机器上会变样。
 - 印泥红 `#B3402A` **只**用于「导出 PDF」按钮和警告，别挪作普通强调色（强调用松墨绿 `#17503F` / 各模板 accent）。
+- **`[hidden]` 陷阱**：给已设作者 `display` 的容器（`.workbench` / `.apps-view`）加 `hidden` 属性**不会**隐藏（作者规则盖掉 UA 的 `[hidden]`），必须配 `…[hidden]{display:none!important}`；否则它会盖在别的视图上抢点击（v2 看板上线时就因此踩坑）。
 
-**完成度清单**（`checklist.js`）的「页数」规则是**模板感知**的：modern/classic 要求 1 页，academic 放宽到 ≤2 页（保研/出国 CV 本就常 1–2 页）。改这条阈值要同时顾及两套语义。
+**完成度清单**（`checklist.js`）的「页数」规则是**模板感知**的：modern/classic 要求 1 页，academic 放宽到 ≤2 页（保研/出国 CV 本就常 1–2 页）。改这条阈值要同时顾及两套语义。规则若需动态 tip/target，用 `detail(doc)` 返回 `{ok,tip,target}`（hollow、jd 规则用它，比 pass/tip/target 灵活）；`target:'__jd'` 由清单的点击处理器特判——聚焦 `#jd-card textarea`（该面板在 `#form-sections` 之外，`Editor.flashField` 找不到它）。
 
 **server.js**：零依赖 `http` 静态服务，`PORT` 默认 8769（8768 已被占用），`EADDRINUSE` 且未显式设 `PORT` 时 +1 重试。
 

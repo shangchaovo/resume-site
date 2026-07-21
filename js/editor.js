@@ -354,6 +354,81 @@
     inner.appendChild(add);
   }
 
+  /* 经历描述的增强：行内空心提示 + 示例句库 + 动词库（反同质化，纯规则） */
+  function attachBulletsExtras(wrap, ta, kind) {
+    if (!wrap || !ta) return;
+
+    var toggle = el('button', 'btn-link');
+    toggle.type = 'button';
+    toggle.textContent = '＋ 看示例句 / 动词库';
+
+    var panel = el('div', 'ex-panel');
+    panel.hidden = true;
+    var ex = (window.ContentLib.EXEMPLARS[kind] || window.ContentLib.EXEMPLARS.internships);
+    var exWrap = el('div', 'ex-group');
+    exWrap.innerHTML = '<div class="ex-label mono">本类型示例（点击追加一行）</div>';
+    ex.forEach(function (line) {
+      var b = el('button', 'ex-line');
+      b.type = 'button';
+      b.textContent = line;
+      b.title = '追加到描述';
+      b.addEventListener('click', function () { appendLine(ta, line); });
+      exWrap.appendChild(b);
+    });
+    panel.appendChild(exWrap);
+    var vlabel = el('div', 'ex-label mono');
+    vlabel.textContent = '开头动词（点击插入光标处）';
+    panel.appendChild(vlabel);
+    Object.keys(window.ContentLib.VERBS).forEach(function (g) {
+      var row = el('div', 'verb-group');
+      var gl = el('span', 'verb-glabel'); gl.textContent = g;
+      row.appendChild(gl);
+      window.ContentLib.VERBS[g].forEach(function (v) {
+        var c = el('button', 'verb-chip');
+        c.type = 'button'; c.textContent = v;
+        c.addEventListener('click', function () { insertAtCaret(ta, v); });
+        row.appendChild(c);
+      });
+      panel.appendChild(row);
+    });
+
+    var hollow = el('div', 'field-hint hollow-hint');
+    hollow.hidden = true;
+
+    toggle.addEventListener('click', function () { panel.hidden = !panel.hidden; });
+    ta.addEventListener('input', function () { updateHollow(ta, hollow); });
+
+    wrap.appendChild(toggle);
+    wrap.appendChild(panel);
+    wrap.appendChild(hollow);
+    updateHollow(ta, hollow);
+  }
+
+  function updateHollow(ta, hint) {
+    var idx = window.ContentLib.hollowLines(ta.value.split('\n'));
+    if (idx.length) {
+      hint.hidden = false;
+      hint.textContent = '第 ' + idx.join('、') + ' 行像「空心句」：动词开头后请补「方法 + 量化结果」（提示，非判决）';
+    } else {
+      hint.hidden = true;
+    }
+  }
+
+  function appendLine(ta, text) {
+    var v = ta.value;
+    ta.value = v + (v && !/\n$/.test(v) ? '\n' : '') + text;
+    ta.selectionStart = ta.selectionEnd = ta.value.length;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    ta.focus();
+  }
+
+  function insertAtCaret(ta, text) {
+    ta.focus();
+    var s = ta.selectionStart, e = ta.selectionEnd;
+    ta.setRangeText(text, s, e, 'end');
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
   function entryNode(cfg, entry, idx, list) {
     var card = el('div', 'entry');
     card.dataset.entryId = entry.id;
@@ -402,14 +477,16 @@
 
     /* 经历描述 */
     if (cfg.bullets) {
-      card.appendChild(rowNode([
+      var brow = rowNode([
         fieldNode({ l: '经历描述', w: 'textarea', rows: 4,
           ph: '负责社群运营，通过策划 12 场裂变活动，实现用户数从 0 增长至 8000+（+400%）\n主导招新流程线上化，纳新转化率提升 25%',
           hint: '一行一条 · 动词开头 + 量化结果' },
           (entry.bullets || []).join('\n'),
           cfg.key + '.' + entry.id + '.bullets',
           linesBind(null, function (a) { entry.bullets = a; }))
-      ]));
+      ]);
+      card.appendChild(brow);
+      attachBulletsExtras(brow.querySelector('.field'), brow.querySelector('textarea'), cfg.kind);
     }
 
     /* 拖拽 */

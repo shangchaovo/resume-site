@@ -45,7 +45,9 @@
         template: 'modern',
         theme: 'navy',
         density: 'standard',
-        hiddenSections: []
+        hiddenSections: [],
+        jd: '',
+        jdKeywords: []
       },
       resume: {
         basics: {
@@ -77,6 +79,8 @@
     };
     if (!out.meta.id) out.meta.id = uid('d');
     if (!Array.isArray(out.settings.hiddenSections)) out.settings.hiddenSections = [];
+    if (typeof out.settings.jd !== 'string') out.settings.jd = '';
+    if (!Array.isArray(out.settings.jdKeywords)) out.settings.jdKeywords = [];
     ['modern', 'classic', 'academic'].indexOf(out.settings.template) === -1 && (out.settings.template = 'modern');
     ['compact', 'standard', 'relaxed'].indexOf(out.settings.density) === -1 && (out.settings.density = 'standard');
     var r = out.resume;

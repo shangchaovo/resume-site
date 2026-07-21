@@ -108,6 +108,47 @@ try:
         secs = page.evaluate("()=>[...document.querySelectorAll('#resume-sheet [data-sec]')].map(e=>e.dataset.sec)")
         check("campus" not in secs and "selfEvaluation" not in secs and "education" in secs, "隐藏分区不渲染")
 
+        # ---- 集群：内容质量（空心句）单元 ----
+        h = page.evaluate("()=>({a:ContentLib.isHollow('负责日常维护与对接'),b:ContentLib.isHollow('重构图表组件，首屏从 2.4s 降至 0.9s（-62%）'),c:ContentLib.isHollow('优化')})")
+        check(h["a"] is True and h["b"] is False and h["c"] is False, "空心句检测 isHollow")
+
+        # ---- 集群：JD 关键词对照（置确定性状态） ----
+        page.evaluate("""()=>{const d=Store.getCurrent();
+          d.resume.internships=[{id:'j1',company:'C',role:'R',start:'2025.01',end:'2025.03',bullets:['用 Vue 3 重构看板，首屏从 2s 降至 0.8s（-60%）']}];
+          d.settings.jd='需要 Vue 与 Python，要求沟通能力'; d.settings.hiddenSections=[]; Store.touch();}""")
+        page.wait_for_timeout(400)
+        jd = page.evaluate("()=>{const m=JDMatch.compute(Store.getCurrent());return{covered:m.covered.map(x=>x.key),missing:m.missing.map(x=>x.key),active:m.active}}")
+        check(jd["active"] and "vue" in jd["covered"] and "python" in jd["missing"] and "沟通" in jd["missing"], "JD 覆盖/缺失计算")
+        check(page.evaluate("()=>!![...document.querySelectorAll('.check-row.fail')].find(r=>r.dataset.target==='__jd')"), "JD 缺失时清单规则失败")
+        page.fill('.jd-add', '微服务'); page.click('.jd-addbtn'); page.wait_for_timeout(300)
+        check("微服务" in page.evaluate("()=>JDMatch.compute(Store.getCurrent()).missing.map(x=>x.key)"), "JD 手动加词生效")
+
+        # ---- 集群：建议文件名（确定性） ----
+        page.evaluate("()=>{const d=Store.getCurrent();d.resume.basics.name='测名';d.resume.education[0].school='测校';d.resume.basics.jobIntent='测岗实习';Store.touch();}")
+        page.wait_for_timeout(300)
+        fn = page.evaluate("()=>App.suggestedFilename()")
+        check(fn == "测名-测校-测岗实习.pdf", "建议文件名 sanitize 正确: " + fn)
+
+        # ---- 集群：自查三问 ----
+        mtxt = page.evaluate("()=>[...document.querySelectorAll('.manual-row')].map(r=>r.textContent).join('|')")
+        check(("真实" in mtxt) and ("相关" in mtxt) and ("面试" in mtxt), "自查清单含报告三问")
+
+        # ---- 集群：投递看板 模块 CRUD ----
+        ar = page.evaluate("""()=>{const it=Apps.add({company:'模块测试',role:'前端',status:'已投'});
+          const has=Apps.list().some(x=>x.id===it.id); Apps.update(it.id,{status:'面试'});
+          const st=Apps.list().find(x=>x.id===it.id).status; Apps.remove(it.id);
+          return{has,st,gone:!Apps.list().some(x=>x.id===it.id)}}""")
+        check(ar["has"] and ar["st"] == "面试" and ar["gone"], "apps 模块 增/改/删")
+
+        # ---- 集群：看板 UI 闭环 ----
+        page.click('#view-switch [data-view="apps"]'); page.wait_for_timeout(300)
+        check(page.locator("#apps-view").is_visible() and page.locator(".workbench").is_hidden(), "切换到看板视图")
+        page.click('#btn-app-add'); page.wait_for_timeout(300)
+        page.fill('#m-company', 'UI闭环公司'); page.fill('#m-role', '前端'); page.click('#m-save'); page.wait_for_timeout(300)
+        check(page.locator(".app-card").count() >= 1 and "UI闭环公司" in page.locator(".app-co").first.inner_text(), "看板新增卡片渲染")
+        page.click('#view-switch [data-view="editor"]'); page.wait_for_timeout(300)
+        check(page.locator(".workbench").is_visible() and page.locator("#apps-view").is_hidden(), "切回编辑器视图")
+
         # 移动端
         m = browser.new_context(viewport={"width": 390, "height": 800})
         mp = m.new_page(); mp.goto(BASE); mp.wait_for_load_state("networkidle"); mp.wait_for_timeout(600)

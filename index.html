@@ -24,7 +24,14 @@
       </div>
     </div>
 
-    <div class="topbar-group draft-group">
+    <div class="topbar-group view-group">
+      <div class="segmented" id="view-switch">
+        <button class="seg-btn active" data-view="editor">编辑器</button>
+        <button class="seg-btn" data-view="apps">投递看板</button>
+      </div>
+    </div>
+
+    <div class="topbar-group draft-group editor-only">
       <select id="draft-select" class="draft-select" aria-label="选择草稿"></select>
       <button class="icon-btn" id="btn-draft-new" title="新建空白草稿">＋</button>
       <button class="icon-btn" id="btn-draft-copy" title="复制当前草稿">⧉</button>
@@ -38,15 +45,20 @@
         <span class="save-text mono" id="save-text">未保存</span>
       </span>
       <button class="btn ghost" id="btn-guide">写作指南</button>
-      <button class="btn ghost" id="btn-fill-demo">填入示例</button>
-      <button class="btn ghost" id="btn-export-json">导出 JSON</button>
-      <button class="btn ghost" id="btn-import-json">导入 JSON</button>
+      <button class="btn ghost editor-only" id="btn-fill-demo">填入示例</button>
+      <button class="btn ghost editor-only" id="btn-export-json">导出 JSON</button>
+      <button class="btn ghost editor-only" id="btn-import-json">导入 JSON</button>
       <input type="file" id="import-file" accept="application/json,.json" hidden>
-      <button class="btn stamp" id="btn-export-pdf">导出 PDF</button>
+      <button class="btn ghost editor-only" id="btn-log-app" title="把当前简历记一笔投递">记入投递看板</button>
+      <span class="filename-chip editor-only" id="filename-chip" title="建议的 PDF 文件名 · 点击复制">
+        <span class="mono" id="filename-text"></span>
+        <button class="icon-btn" id="btn-copy-name" title="复制文件名">⧉</button>
+      </span>
+      <button class="btn stamp editor-only" id="btn-export-pdf">导出 PDF</button>
     </div>
   </header>
 
-  <div class="mobile-switch" id="mobile-switch">
+  <div class="mobile-switch editor-only" id="mobile-switch">
     <button class="seg-btn active" data-view="edit">编辑</button>
     <button class="seg-btn" data-view="preview">预览</button>
   </div>
@@ -54,7 +66,9 @@
   <main class="workbench">
     <aside class="form-pane" id="form-pane">
       <div class="card checklist-card" id="checklist-card"></div>
+      <div class="card jd-card" id="jd-card"></div>
       <div id="form-sections"></div>
+      <div class="trust-strip">🔒 数据仅存本机 · 永久免费 · 无水印 · 不自动续费</div>
     </aside>
 
     <section class="preview-pane">
@@ -98,6 +112,48 @@
       <div class="sheet-measure tpl-modern density-standard" id="sheet-measure" aria-hidden="true"></div>
     </section>
   </main>
+
+  <section class="apps-view" id="apps-view" hidden>
+    <div class="apps-head">
+      <div>
+        <h2 class="apps-title">投递看板</h2>
+        <span class="mono apps-sub">把每份简历和投递串起来 · 拖卡片可改状态 · 数据仅存本机 · <span id="apps-total">0 条投递</span></span>
+      </div>
+      <button class="btn stamp" id="btn-app-add">＋ 记一笔投递</button>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <div class="modal-scrim" id="app-scrim" hidden></div>
+  <div class="modal" id="app-modal" hidden role="dialog" aria-modal="true">
+    <header class="modal-head">
+      <h3 id="m-title">记一笔投递</h3>
+      <button class="icon-btn" id="m-cancel-top" title="关闭">✕</button>
+    </header>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>公司 / 组织</label><input type="text" id="m-company" placeholder="字节跳动"></div>
+        <div class="field"><label>岗位</label><input type="text" id="m-role" placeholder="前端开发工程师"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>投递日期</label><input type="text" id="m-date" placeholder="2026-07-21"></div>
+        <div class="field"><label>状态</label><select id="m-status"></select></div>
+      </div>
+      <div class="field-row one">
+        <div class="field"><label>岗位链接 / JD 地址 <span class="opt">· 选填</span></label><input type="text" id="m-link" placeholder="https://..."></div>
+      </div>
+      <div class="field-row one">
+        <div class="field"><label>关联简历版本</label><select id="m-draft"></select></div>
+      </div>
+      <div class="field-row one">
+        <div class="field"><label>备注 <span class="opt">· 选填</span></label><textarea id="m-note" rows="2" placeholder="内推人、面试轮次、待补材料…"></textarea></div>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button class="btn ghost" id="m-cancel">取消</button>
+      <button class="btn stamp" id="m-save">保存</button>
+    </footer>
+  </div>
 </div>
 
 <aside class="guide-drawer" id="guide-drawer" aria-label="简历写作指南">
@@ -125,6 +181,13 @@
           <p class="good">✓ 负责社团公众号运营，通过策划 12 场裂变活动与栏目改版，6 个月内粉丝从 0 增长至 8000+（+400%），篇均阅读量提升 3 倍</p>
         </div>
         <p>量化维度：数量、百分比、金额、时间周期、覆盖人次、排名。没有精确数字就用量级（近百人、数十场）。</p>
+        <p><strong>按类型抓重点：</strong></p>
+        <ul>
+          <li><strong>实习</strong>：业务影响 + 工程指标（性能、覆盖率、节省人日）</li>
+          <li><strong>项目</strong>：从 0 到 1 的角色 + 技术难点 + 用户/数据结果</li>
+          <li><strong>社团 / 志愿</strong>：组织规模 + 你推动的变化（转化率、覆盖人次）</li>
+          <li><strong>科研</strong>：方法 + 基准提升 + 你的具体贡献（一作 / 二作）</li>
+        </ul>
       </div>
     </details>
     <details class="guide-item">
@@ -166,11 +229,14 @@
 <div class="toast-host" id="toast-host" aria-live="polite"></div>
 
 <script src="js/schema.js"></script>
+<script src="js/contentlib.js"></script>
 <script src="js/store.js"></script>
 <script src="js/templates.js"></script>
 <script src="js/editor.js"></script>
 <script src="js/preview.js"></script>
+<script src="js/jdmatch.js"></script>
 <script src="js/checklist.js"></script>
+<script src="js/apps.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

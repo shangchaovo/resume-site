@@ -11,9 +11,10 @@
   var currentPage = 1;
 
   var MANUAL = [
-    { id: 'proofread', text: '已通读，无错别字与中英文标点混用' },
-    { id: 'dates', text: '所有日期真实可查' },
-    { id: 'jd', text: '已按目标岗位 JD 调整关键词' }
+    { id: 'truth', text: '每条经历都真实、能在面试里被追问核验' },
+    { id: 'relevant', text: '每条都与目标岗位相关（无关的果断删掉）' },
+    { id: 'expand', text: '每条都能在面试里展开讲 1–2 分钟' },
+    { id: 'polish', text: '已通读：无错别字、无中英文标点混用' }
   ];
 
   /* 每条规则：{ id, text, tip(失败提示), target(点击跳转的 data-path 前缀), pass(doc, pages) } */
@@ -67,6 +68,17 @@
       }
     },
     {
+      id: 'hollow', text: '经历无空心描述', target: null,
+      detail: function (doc) {
+        var s = window.ContentLib.scanDoc(doc);
+        return {
+          ok: s.count === 0,
+          tip: s.count + ' 条疑似空心句：动词开头后补「方法 + 量化结果」',
+          target: s.firstPath
+        };
+      }
+    },
+    {
       id: 'specific', text: '经历描述够具体', tip: '至少 60% 的描述行 ≥15 字；太短说明没有展开「做了什么 + 结果」', target: 'internships',
       pass: function (d) {
         var all = [], longEnough = 0;
@@ -95,6 +107,20 @@
           }
         });
         return ok;
+      }
+    },
+    {
+      id: 'jdmatch', text: 'JD 关键词已覆盖', target: '__jd',
+      detail: function (doc) {
+        var jd = (doc.settings && doc.settings.jd || '').trim();
+        if (!jd) return { ok: true, tip: '', target: '__jd' };
+        var m = window.JDMatch.compute(doc);
+        if (!m.active || !m.missing.length) return { ok: true, tip: '', target: '__jd' };
+        return {
+          ok: false,
+          tip: 'JD 还缺：' + m.missing.slice(0, 4).map(function (x) { return x.disp; }).join('、'),
+          target: '__jd'
+        };
       }
     },
     {
@@ -130,13 +156,15 @@
     if (!root || !doc) return;
     var passed = 0;
     var rows = RULES.map(function (r) {
-      var ok = !!r.pass(doc, currentPage);
+      var info = r.detail ? r.detail(doc, currentPage)
+        : { ok: !!r.pass(doc, currentPage), tip: r.tip, target: r.target };
+      var ok = !!info.ok;
       if (ok) passed++;
       return '<button class="check-row ' + (ok ? 'pass' : 'fail') + '"' +
-        (r.target ? ' data-target="' + r.target + '"' : '') + ' type="button">' +
+        (info.target ? ' data-target="' + info.target + '"' : '') + ' type="button">' +
         '<span class="check-icon">' + (ok ? '✓' : '!') + '</span>' +
         '<span class="check-row-body"><span>' + r.text + '</span>' +
-        (!ok ? '<span class="check-tip">' + r.tip + '</span>' : '') +
+        (!ok && info.tip ? '<span class="check-tip">' + info.tip + '</span>' : '') +
         '</span></button>';
     }).join('');
 
@@ -160,7 +188,17 @@
 
     root.querySelectorAll('.check-row[data-target]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        window.Editor.flashField(btn.dataset.target);
+        var t = btn.dataset.target;
+        if (t === '__jd') {
+          var ta = document.querySelector('#jd-card textarea');
+          if (ta) {
+            ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            ta.focus({ preventScroll: true });
+            ta.classList.remove('flash'); void ta.offsetWidth; ta.classList.add('flash');
+          }
+          return;
+        }
+        window.Editor.flashField(t);
       });
     });
     root.querySelectorAll('.check-row[data-manual]').forEach(function (btn) {

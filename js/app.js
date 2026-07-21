@@ -48,13 +48,18 @@
     Editor.buildForm(doc);
     Preview.render(doc);
     Checklist.render(doc);
+    JDMatch.render($('jd-card'), doc);
     syncControls();
     refreshDraftSelect();
+    refreshFilename();
+    window.Apps.refreshDraftOptions();
   }
 
   function lightRefresh() {
     Preview.render(doc);
     Checklist.render(doc);
+    JDMatch.renderLists($('jd-card'), doc);
+    refreshFilename();
   }
 
   /* ---------------- 控件同步 ---------------- */
@@ -171,9 +176,36 @@
   function wireExport() {
     $('btn-export-pdf').addEventListener('click', function () {
       window.Store.flushSave();
-      toast('在打印对话框中：<br><span class="mono">目标 → 另存为 PDF｜纸张 → A4｜边距 → 无｜勾选「背景图形」</span>', { ms: 6500 });
+      toast('建议文件名 <span class="mono">' + escapeHtml(suggestedFilename()) + '</span><br>' +
+        '打印对话框：<span class="mono">目标 → 另存为 PDF｜纸张 → A4｜边距 → 无｜勾选「背景图形」</span>', { ms: 7000 });
       setTimeout(function () { window.print(); }, 400);
     });
+  }
+
+  /* 建议文件名：姓名-学校-岗位.pdf（呼应研究报告的命名建议） */
+  function sanitize(s) { return String(s || '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim(); }
+  function suggestedFilename() {
+    var b = doc.resume.basics || {};
+    var school = doc.resume.education && doc.resume.education[0] ? doc.resume.education[0].school : '';
+    var parts = [b.name, school, b.jobIntent].map(sanitize).filter(Boolean);
+    return (parts.length ? parts.join('-') : '简历') + '.pdf';
+  }
+  function refreshFilename() { var el = $('filename-text'); if (el) el.textContent = suggestedFilename(); }
+  function copyText(t) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(fallback);
+    else fallback();
+  }
+  function wireFilename() {
+    function copy() { copyText(suggestedFilename()); toast('已复制文件名：' + escapeHtml(suggestedFilename())); }
+    $('filename-chip').addEventListener('click', copy);
+    $('btn-copy-name').addEventListener('click', function (e) { e.stopPropagation(); copy(); });
   }
 
   /* ---------------- JSON 备份 ---------------- */
@@ -276,6 +308,35 @@
     });
   }
 
+  /* ---------------- 视图切换：编辑器 / 投递看板 ---------------- */
+
+  function setView(view) {
+    var isApps = view === 'apps';
+    document.querySelector('.workbench').hidden = isApps;
+    $('apps-view').hidden = !isApps;
+    document.querySelector('.app').classList.toggle('view-apps', isApps);
+    document.querySelectorAll('#view-switch .seg-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+    if (isApps) window.Apps.render();
+    else window.Preview.fit();
+  }
+  function wireView() {
+    document.querySelectorAll('#view-switch .seg-btn').forEach(function (b) {
+      b.addEventListener('click', function () { setView(b.dataset.view); });
+    });
+    $('btn-app-add').addEventListener('click', function () { window.Apps.openModal({}); });
+  }
+  function wireLogApp() {
+    $('btn-log-app').addEventListener('click', function () {
+      window.Apps.openModal({
+        draftId: window.Store.currentId(),
+        draftName: doc.meta.name,
+        note: doc.resume.basics.jobIntent || ''
+      });
+    });
+  }
+
   /* ---------------- 启动 ---------------- */
 
   function boot(demoDoc) {
@@ -292,6 +353,10 @@
     wireFillDemo();
     wireMobile();
     wireKeys();
+    wireFilename();
+    window.Apps.wireModal();
+    wireView();
+    wireLogApp();
 
     /* change：同一对象 = 打字（轻刷新）；新对象 = 换草稿（重建） */
     window.Store.on('change', function (d) {
@@ -320,6 +385,7 @@
 
   window.App = {
     refreshNow: function () { if (doc) { Preview.render(doc); } },
-    toast: toast
+    toast: toast,
+    suggestedFilename: function () { return doc ? suggestedFilename() : ''; }
   };
 })();
