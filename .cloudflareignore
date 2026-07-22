@@ -1,0 +1,12 @@
+# 仅部署纯静态站点资源到 Cloudflare Pages。
+# 排除仓库历史/服务器/脚本/文档，避免泄露 git 提交记录与无关文件。
+.git
+.gitignore
+.cloudflareignore
+.DS_Store
+node_modules
+server.js
+launchd
+scripts
+*.md
+*.py

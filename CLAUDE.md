@@ -59,3 +59,9 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 ## 验证矩阵
 
 `scripts/e2e.py` 已覆盖主路径。手工补查：三模板 × 六主题 × 三密度 抽查截图；空草稿清单应多项红、示例数据应全绿；改坏手机号 → 「手机号格式」规则变红且点击能定位闪烁；导出 PDF 三模板各看一份。
+
+## 发布到公网（Cloudflare Pages）
+
+已部署为 Cloudflare Pages 项目 `resume`，公网 **https://resume-5lv.pages.dev/**（免费、全球 CDN、Mac 关机也在）。`resume.pages.dev` 主机名被全局占用，故 CF 自动加 `-5lv`；项目名仍是 `resume`。要主机名恰好 `resume`：用其 Cloudflare 自有域名做 Pages 自定义域 `resume.<域名>`（同账号会自动建 DNS，免费即时）。
+
+重新部署：`bash scripts/deploy-pages.sh`。它把 `index.html + css/ js/ data/` 拷到临时目录再上传——**wrangler 直接上传不读 `.cloudflareignore`**，所以必须用干净目录法，否则 `server.js`/`.git`/`launchd`/文档会被传上公网（泄露本机路径）。`.cloudflareignore` 仅对 git-build 模式有意义。首次需 `npx wrangler login` 一次性授权。另：Pages 对不存在路径回退返回 `index.html`（200），故**别用「curl 某路径是否 200」判断文件是否泄露**，要看响应体或上传清单。

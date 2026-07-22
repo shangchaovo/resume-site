@@ -99,3 +99,11 @@ launchctl load -w ~/Library/LaunchAgents/com.campus-resume-builder.server.plist
 ## 技术栈
 
 纯 HTML / CSS / 原生 JS，零依赖、零打包；一个零依赖的 Node 静态服务器。简历排版用本地系统字体栈，保证导出的 PDF 在任何电脑上都长一个样。
+
+## 公网访问
+
+已部署到 Cloudflare Pages，电脑关机也能打开：**https://resume-5lv.pages.dev/**
+
+- 改完代码想更新公网版：`bash scripts/deploy-pages.sh`（首次需 `npx wrangler login` 一次性浏览器授权）。
+- 想让自己的域名也叫 resume（如 `resume.你的域名`）：在 Cloudflare 给这个 Pages 项目加「自定义域」即可，免费、即时生效。
+- 为什么不是 `resume.pages.dev`：这个免费子域名已被他人占用（共享命名空间），所以自动带了 `-5lv` 后缀，不是 bug。
