@@ -52,20 +52,21 @@ body {
 
 .mono { font-family: var(--font-mono); }
 
-.app { height: 100vh; display: flex; flex-direction: column; }
+.app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
 /* ----------------------------- Topbar ----------------------------- */
 
-/* 桌面：包装层不生成盒子，保持原 flex 布局；移动端在媒体查询里改为 sticky */
-.sticky-head { display: contents; }
+/* 顶栏包装层始终吸顶：桌面 body 不滚动时等同置顶，移动端长滚动时钉住操作栏 */
+.sticky-head { position: sticky; top: 0; z-index: 45; }
 
 .topbar {
-  height: 56px;
-  flex: 0 0 56px;
+  min-height: 56px;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 16px;
+  flex-wrap: wrap;          /* 控件过多时换行，绝不被 body 裁掉而够不到导出按钮 */
+  gap: 8px 14px;
+  padding: 8px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--panel-edge);
   box-shadow: 0 1px 0 #dfe4da;
@@ -210,11 +211,13 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 400px 1fr;
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
 }
 
 .form-pane {
   overflow-y: auto;
+  min-height: 0;
   padding: 16px 16px 20px;
   border-right: 1px solid var(--panel-edge);
   background: linear-gradient(180deg, rgba(253, 253, 251, .55), rgba(253, 253, 251, 0) 220px);
@@ -224,6 +227,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   position: relative;
 }
 
@@ -318,6 +322,7 @@ body {
 
 .preview-stage {
   flex: 1;
+  min-height: 0;
   overflow: auto;
   padding: 32px;
   display: flex;
@@ -871,7 +876,7 @@ body {
 
 @media (max-width: 980px) {
   body { overflow: auto; }
-  .app { height: auto; min-height: 100vh; }
+  .app { height: auto; min-height: 100vh; overflow: visible; }
   .topbar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
   .topbar-right { margin-left: 0; flex-wrap: wrap; }
   .draft-group { border-left: none; padding-left: 0; margin-left: 0; }

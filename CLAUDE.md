@@ -44,6 +44,7 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 - 印泥红 `#B3402A` **只**用于「导出 PDF」按钮和警告，别挪作普通强调色（强调用松墨绿 `#17503F` / 各模板 accent）。
 - **`[hidden]` 陷阱**：给已设作者 `display` 的容器（`.workbench` / `.apps-view`）加 `hidden` 属性**不会**隐藏（作者规则盖掉 UA 的 `[hidden]`），必须配 `…[hidden]{display:none!important}`；否则它会盖在别的视图上抢点击（v2 看板上线时就因此踩坑）。
 - **移动端吸顶**：顶栏 + 编辑/预览切换包在 `.sticky-head` 里——桌面 `display:contents`（不破坏 `.app` 的 flex/100vh 布局），移动端 `position:sticky` 整块吸顶；否则长表单一滚，导出 PDF / 视图切换就滚出视野（用户报过「被挡住 / 无法导出」）。底部信任条**必须静态**：移动端表单不是独立滚动容器，`sticky bottom` 会浮起盖住页面底部内容。
+- **桌面是「不滚动外壳 + 两栏内部滚动」**，这套缺一不可：`.app{overflow:hidden}`、`.workbench{grid-template-rows:minmax(0,1fr)}`、`.form-pane`/`.preview-pane`/`.preview-stage{min-height:0}`。少了 `minmax(0,1fr)`/`min-height:0`，grid/flex 子项不会收缩、`overflow:auto` 不生效，内容就溢出整页、顶栏被推走且滚不回（用户报过「往下拉就回不去」）。顶栏控件多，必须 `flex-wrap:wrap`（高度 `flex:0 0 auto`）：否则稍窄的桌面会把「导出 PDF」挤出右边界，而 `body:overflow:hidden` 没有横向滚动条 → 按钮彻底够不到。改顶栏加/减按钮后，务必在 1024/1280/1440 宽各看一眼导出按钮是否完整可见。
 
 **完成度清单**（`checklist.js`）的「页数」规则是**模板感知**的：modern/classic 要求 1 页，academic 放宽到 ≤2 页（保研/出国 CV 本就常 1–2 页）。改这条阈值要同时顾及两套语义。规则若需动态 tip/target，用 `detail(doc)` 返回 `{ok,tip,target}`（hollow、jd 规则用它，比 pass/tip/target 灵活）；`target:'__jd'` 由清单的点击处理器特判——聚焦 `#jd-card textarea`（该面板在 `#form-sections` 之外，`Editor.flashField` 找不到它）。
 

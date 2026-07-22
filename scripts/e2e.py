@@ -49,6 +49,9 @@ try:
         check("陈晓雨" in page.locator("#resume-sheet .r-name").inner_text(), "首屏示例渲染")
         check("1 页" in page.locator("#page-badge").inner_text(), "首屏 1 页")
         check("已保存" in page.locator("#save-text").inner_text(), "初始保存徽章=已保存")
+        # 桌面顶栏不能被横向裁切（v2 曾把导出按钮挤出右边界）
+        eb = page.locator("#btn-export-pdf").bounding_box()
+        check(eb is not None and eb["x"] >= 0 and eb["x"] + eb["width"] <= 1440, "桌面导出按钮未被横向裁切")
         check(page.locator(".check-row.fail").count() == 0, "示例数据清单全绿")
 
         # 输入同步
