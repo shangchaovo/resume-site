@@ -20,12 +20,18 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 
 ## Architecture — 跨文件才看得懂的点
 
-**运行时模型**：无打包器、无 ESM。`index.html` 按固定顺序用 `<script>` 加载 `schema → contentlib → store → templates → editor → preview → jdmatch → checklist → apps → app`；每个文件是 IIFE，向外暴露一个具名全局（`ResumeSchema / ContentLib / Store / Templates / Editor / Preview / JDMatch / Checklist / Apps / App`），彼此直接读全局。**改加载顺序或把某文件改成 ESM 会破坏这条链。** v2 三模块：`contentlib`（空心句检测 + 分类型示例/动词库）、`jdmatch`（JD 关键词**透明对照**，只给覆盖/缺失，绝不出 ATS 分数）、`apps`（投递看板，自管 `crb:apps`）；`app.js` 另管「编辑器/看板」视图切换、建议文件名复制、信任条接线。
+**运行时模型**：无打包器、无 ESM。`index.html` 按固定顺序用 `<script>` 加载 `schema → contentlib → store → templates → editor → preview → sheetedit → jdmatch → checklist → apps → app`；每个文件是 IIFE，向外暴露一个具名全局（`ResumeSchema / ContentLib / Store / Templates / Editor / Preview / SheetEdit / JDMatch / Checklist / Apps / App`），彼此直接读全局。**改加载顺序或把某文件改成 ESM 会破坏这条链。** v2 三模块：`contentlib`（空心句检测 + 分类型示例/动词库）、`jdmatch`（JD 关键词**透明对照**，只给覆盖/缺失，绝不出 ATS 分数）、`apps`（投递看板，自管 `crb:apps`）；`app.js` 另管「编辑器/看板」视图切换、建议文件名复制、信任条接线。`sheetedit`（右侧预览**点选即改**，见下）。
 
 **核心不变量 —— `touch()` vs 文档引用变更**（横跨 `store.js`/`app.js`/`editor.js`）：
 - 打字/改字段调用 `Store.touch()`：`doc` 是**同一对象引用**，`app.js` 的 `change` 监听器据此只做**轻刷新**（重渲染预览 + 清单），**不重建表单** —— 否则输入框会丢焦点。
 - 切换/新建/导入/替换草稿时 `store` 把 `current` 换成**新对象**，`app.js` 检测到引用变化才 `fullRebuild()`（重建表单 + 同步控件）。
 - 想新增「整份替换内容」的入口，必须走 `Store.replaceCurrent/switchDraft/...`（产生新引用），别原地 mutate 后 `touch()`，否则表单不刷新。
+
+**右侧预览「点选即改」**（`sheetedit.js` 暴露 `SheetEdit`，与 `templates.js` 的埋点、`editor.js` 的 `syncField` 三方协作）：
+- `templates.js` 用 `ed(path, inner, opts)` 给每个可编辑文本包 `<span class="ped" data-edit="路径">`；组合头（公司+岗位+城市）用 `combo(id,'company,role,city',[...])` 包成 `data-k="c"` + `data-parts`，起止时间 `data-k="p"`，证件照 `data-k="photo"`，第 N 条描述 `bullets.N`。**新增可编辑字段必须走 `ed()`/这套 `data-k` 约定**，否则点不中。
+- `sheetedit.js` 在 `#resume-sheet` 上**捕获阶段**做事件委托，点 `.ped` → 弹跟随的 `.pe-pop` 小编辑框 → `resolve(path)` 把路径翻成 `{get,set}` → `set(v)` + `Store.touch()`（轻刷新，**不重建表单**）→ `syncLeft()` 调 `Editor.syncField` 把左侧对应输入框同步过来（跳过正聚焦的框，防抢焦点）。
+- `$` 助手对 `#id` 走 `getElementById`（不是 `querySelector`）——历史上 `init` 传了不带 `#` 的串导致 `sheet=NULL` 静默不绑定，点预览毫无反应。改这里若「点了没反应」先查 `init` 是否拿到 sheet。
+- 打印时 `.pe-pop{display:none}`、高亮 `.pe-hl` 去 outline/背景，保证导出 PDF 干净（`@media print`）。
 
 **渲染 / 主题模型**（`templates.js` + `templates.css` + `preview.js` + `app.js`）：
 - 挂载节点 `<div class="sheet tpl-{modern|classic|academic} density-{compact|standard|relaxed}">`。密度由 class 在 css 里设 `--fs-* / --pad / --sec-gap` 等变量；主题由 `app.js` 读 `Preview.THEMES` 把 `--tpl-accent / -soft / -ink` **内联**到 sheet —— 故意不用 `color-mix()`，使打印输出与屏幕逐字一致。
@@ -54,7 +60,7 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 ## 改东西时的多文件触点
 
 - **加一套模板**：`templates.js` 写渲染器并登记进 `RENDERERS`；`templates.css` 写 `.tpl-xxx` 排版；`index.html` 的 `#tpl-switch` 加一个 `seg-btn`；`schema.js` 的 `settings.template` 白名单（`migrate` 里）加该 key；若该模板有独有分区，在 `checklist.js` 的页数规则/渲染跳过逻辑里考虑。
-- **加一个表单字段**：`schema.js` 的 `emptyResume`/`emptyEntry`/`migrate` 给默认值与归一；`editor.js` 的对应 `SECTIONS` rows（或 `buildBasics/buildSkills`）加 `fieldNode`；若该字段要显示，在对应渲染器里取值并保证空值跳过。
+- **加一个表单字段**：`schema.js` 的 `emptyResume`/`emptyEntry`/`migrate` 给默认值与归一；`editor.js` 的对应 `SECTIONS` rows（或 `buildBasics/buildSkills`）加 `fieldNode`；若该字段要显示，在对应渲染器里取值并保证空值跳过——且用 `ed('路径', …)` 包埋点让它支持点选即改（组合头/起止时间用 `combo()`/`data-k`，见上）。
 - **加一条完成度规则**：`checklist.js` 的 `RULES` 加 `{id,text,tip,target,pass}`；`target` 是点击要闪烁定位的 `data-path` 前缀（`editor.js` 给每个输入写了 `data-path`）。
 
 ## 验证矩阵

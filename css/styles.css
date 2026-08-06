@@ -1166,8 +1166,8 @@ body {
   animation: pe-in .18s var(--spring);
 }
 @keyframes pe-in {
-  from { opacity: 0; transform: translateY(8px) scale(.94); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .pe-head {
   display: flex; align-items: center; gap: 8px;

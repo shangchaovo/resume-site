@@ -181,21 +181,31 @@
   }
 
   function positionPop(anchor) {
-    var stage = $('#preview-stage');
-    if (!stage || !pop) return;
-    var sr = stage.getBoundingClientRect();
+    /* 挂进 .sheet-wrap（已 position:relative 且随预览一起 transform:scale）。
+       getBoundingClientRect 是「缩放后」的屏幕像素，而弹层 left/top 处在
+       wrap 的「未缩放」坐标系里，差一个 zoom 系数——这正是弹层会漂移的根因。
+       除以 wr.width/794 还原到简历真实坐标，弹层便始终贴住被点文字、随缩放/滚动一起动。 */
+    var wrap = $('#sheet-wrap');
+    if (!wrap || !pop) return;
+    var wr = wrap.getBoundingClientRect();
+    var scale = wr.width / 794;                 /* A4 794px → 当前缩放比 */
+    if (!(scale > 0)) scale = 1;
     var r = anchor.getBoundingClientRect();
     pop.style.visibility = 'hidden';
     pop.style.left = '0px'; pop.style.top = '0px';
-    /* 先量尺寸 */
+    /* 反向抵消缩放：弹层挂在会缩放的 wrap 里，缩小时字会跟着变小看不清，
+       这里再放大回 1/scale，让弹层始终保持可读大小（位置仍贴住锚点）。 */
+    pop.style.transformOrigin = 'top left';
+    pop.style.transform = 'scale(' + (1 / scale) + ')';
+    /* 先量尺寸（未缩放坐标系内） */
     var pw = pop.offsetWidth, ph = pop.offsetHeight;
-    var x = r.left - sr.left + stage.scrollLeft;
-    var y = r.bottom - sr.top + stage.scrollTop + 8;
-    /* 横向夹取在 stage 内 */
-    x = Math.max(8, Math.min(x, stage.scrollWidth - pw - 8));
-    /* 下方不够就放上方 */
-    if (y + ph > stage.scrollTop + stage.clientHeight - 8) {
-      y = r.top - sr.top + stage.scrollTop - ph - 8;
+    var x = (r.left - wr.left) / scale;
+    var y = (r.bottom - wr.top) / scale + 8;
+    /* 横向夹取在简历宽度内（A4 宽 794） */
+    x = Math.max(8, Math.min(x, 794 - pw - 8));
+    /* 下方放不下就翻到上方 */
+    if (y + ph > wrap.offsetHeight) {
+      y = (r.top - wr.top) / scale - ph - 8;
     }
     pop.style.left = x + 'px';
     pop.style.top = y + 'px';
@@ -213,7 +223,7 @@
     var acc = resolve(activePath, el);
     if (!acc) { el.classList.remove('pe-hl'); return; }
 
-    var stage = $('#preview-stage');
+    var wrap = $('#sheet-wrap');
     pop = document.createElement('div');
     pop.className = 'pe-pop';
     pop.innerHTML =
@@ -224,7 +234,7 @@
       '<button type="button" class="pe-btn pe-ok">✓ 完成</button>' +
       '<button type="button" class="pe-btn pe-cancel">取消</button>' +
       '</div>';
-    stage.appendChild(pop);
+    wrap.appendChild(pop);
 
     var body = $('.pe-body', pop);
 
