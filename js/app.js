@@ -343,6 +343,7 @@
     doc = window.Store.init(demoDoc);
     Editor.init($('form-sections'));
     window.Preview.init();
+    window.SheetEdit.init();
     Checklist.init($('checklist-card'));
     buildSwatches();
     wireToolbar();

@@ -95,6 +95,10 @@
 
   function buildForm(d) {
     doc = d;
+    /* 先归一各条目区：让左侧表单与右侧预览可见口径一致（有内容才显示 + 末尾一个空槽） */
+    SECTIONS.forEach(function (c) {
+      if (['basics', 'skills', 'selfEvaluation'].indexOf(c.kind) === -1) syncTrailingSlot(c);
+    });
     root.innerHTML = '';
     var ui = window.Store.getUI();
     var collapsed = ui.collapsedSections || [];
@@ -354,6 +358,32 @@
     inner.appendChild(add);
   }
 
+  /* 有内容的条目数 —— 与右侧预览 entryHasContent 的可见口径一致 */
+  function filledCount(cfg, list) {
+    return (list || []).filter(function (e) { return S.entryHasContent(cfg.kind, e); }).length;
+  }
+
+  /* 维护「末尾空待填槽」：有内容 → 保证末尾恰好一个空槽；全空 → 清空列表。
+     让左侧表单与右侧预览的可见条目始终保持同步。 */
+  function syncTrailingSlot(cfg) {
+    var list = doc.resume[cfg.key];
+    if (!Array.isArray(list)) return;
+    var filled = filledCount(cfg, list);
+    if (filled === 0) {
+      /* 全删光了：清空（含可能残留的空壳），左右两栏同步为「无」 */
+      list.length = 0;
+      return;
+    }
+    /* 有内容：剔除除末尾外的空槽，再保证末尾恰好一个空槽 */
+    for (var i = list.length - 1; i >= 0; i--) {
+      var last = i === list.length - 1;
+      if (!S.entryHasContent(cfg.kind, list[i]) && !last) list.splice(i, 1);
+    }
+    if (S.entryHasContent(cfg.kind, list[list.length - 1])) {
+      list.push(S.emptyEntry(cfg.kind));
+    }
+  }
+
   /* 经历描述的增强：行内空心提示 + 示例句库 + 动词库（反同质化，纯规则） */
   function attachBulletsExtras(wrap, ta, kind) {
     if (!wrap || !ta) return;
@@ -455,7 +485,7 @@
     down.addEventListener('click', function () { move(cfg, idx, 1); });
     del.addEventListener('click', function () {
       list.splice(idx, 1);
-      if (!list.length) list.push(S.emptyEntry(cfg.kind));  /* 保留一个空条目方便继续填写 */
+      /* 删到最后一条 → 列表清空（左右同步为「无」），不再塞回残留空壳 */
       window.Store.touch();
       rebuildSection(cfg.key);
     });
@@ -525,6 +555,7 @@
       var from = parseInt(ev.dataTransfer.getData('text/plain'), 10);
       if (isNaN(from) || from === idx) return;
       var item = list.splice(from, 1)[0];
+      if (!item) return;                       /* 防御：源下标越界（空列表） */
       list.splice(idx, 0, item);
       window.Store.touch();
       rebuildSection(cfg.key);
@@ -566,9 +597,21 @@
     node.classList.add('flash');
   }
 
+  /* sheet 点选编辑后，把 doc 里某字段的最新值回写到左侧表单对应输入框（不重建、不抢焦点）。
+     formPath 形如 basics.name / education.<id>.gpa / skills.items / selfEvaluation */
+  function syncField(formPath, value) {
+    if (!root) return;
+    var node = root.querySelector('[data-path="' + formPath + '"]');
+    if (!node) return;
+    if (document.activeElement === node) return;   /* 用户正在该框打字就别覆盖 */
+    var v = Array.isArray(value) ? value.join('\n') : (value == null ? '' : String(value));
+    if (node.value !== v) node.value = v;
+  }
+
   window.Editor = {
     init: init,
     buildForm: buildForm,
-    flashField: flashField
+    flashField: flashField,
+    syncField: syncField
   };
 })();

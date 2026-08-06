@@ -1126,3 +1126,95 @@ body {
   .apps-view { padding: 12px; overflow: auto; }
   .kanban { grid-auto-columns: 80vw; }
 }
+
+/* ==========================================================================
+   预览点选编辑（SheetEdit）— screen-only，打印不出现
+   ========================================================================== */
+
+@media print {
+  .pe-pop { display: none !important; }
+  .ped.pe-hl { outline: none !important; background: transparent !important; }
+}
+
+/* 可编辑文本：默认几乎隐形，悬停给点提示，不破坏简历排版 */
+.ped { cursor: text; border-radius: 4px; transition: background .12s, box-shadow .12s; }
+.ped:hover {
+  background: var(--lemon-soft);
+  box-shadow: 0 0 0 2px var(--lemon);
+}
+/* 选中高亮（贴纸描边） */
+.ped.pe-hl {
+  background: var(--lemon-soft);
+  box-shadow: 0 0 0 2.5px var(--orange);
+  border-radius: 6px;
+}
+/* 双栏深色侧栏里的悬停反白 */
+.tpl-classic .r-side .ped:hover,
+.tpl-classic .r-side .ped.pe-hl { background: rgba(255,255,255,.22); box-shadow: 0 0 0 2px rgba(255,255,255,.6); }
+
+/* 跟随弹层 */
+.pe-pop {
+  position: absolute;
+  z-index: 40;
+  width: 300px;
+  max-width: 90%;
+  background: var(--panel);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--pop-lg), 0 20px 40px -16px rgba(59,43,32,.45);
+  overflow: hidden;
+  animation: pe-in .18s var(--spring);
+}
+@keyframes pe-in {
+  from { opacity: 0; transform: translateY(8px) scale(.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pe-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  background:
+    radial-gradient(var(--mat-dot) 2px, transparent 2px) 0 0 / 20px 20px,
+    linear-gradient(160deg, var(--lemon-soft), var(--accent-faint));
+  border-bottom: 3px solid var(--line);
+}
+.pe-title { flex: 1; font-size: 13px; font-weight: 800; font-family: var(--font-display); }
+.pe-x {
+  width: 26px; height: 26px; display: grid; place-items: center;
+  border: 2px solid var(--line); background: #fff; color: var(--ink-3);
+  border-radius: 9px; cursor: pointer; font-size: 12px; font-weight: 800;
+  transition: all .15s;
+}
+.pe-x:hover { background: var(--stamp-soft); color: var(--stamp); }
+.pe-body { padding: 12px; }
+.pe-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  padding: 9px 11px;
+  border: 3px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  resize: vertical;
+  transition: border-color .15s, box-shadow .15s;
+}
+.pe-input:focus { outline: none; border-color: var(--orange-deep); box-shadow: 0 0 0 4px var(--orange-soft); }
+.pe-foot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 10px 12px; border-top: 3px solid var(--line);
+}
+.pe-btn {
+  font-family: var(--font-body); font-size: 12px; font-weight: 800;
+  padding: 7px 13px; border: 3px solid var(--line); border-radius: 11px;
+  background: #fff; color: var(--ink); cursor: pointer;
+  box-shadow: var(--pop-sm);
+  transition: transform .14s var(--spring), box-shadow .14s, background .15s;
+}
+.pe-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--line); }
+.pe-btn:active { transform: translateY(1px); box-shadow: 0 0 0 var(--line); }
+.pe-ok { background: var(--mint); color: #fff; }
+.pe-ok:hover { background: #2ed3ad; }
+.pe-photo { display: flex; gap: 8px; }
+.pe-photo .pe-btn { flex: 1; }
+.pe-up { background: var(--sky); color: #fff; }
+.pe-rm { background: var(--stamp-soft); color: var(--stamp); }
