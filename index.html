@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F4F7FA" id="browser-theme-color">
 <title>简历工坊 Resume Forge — 校招简历在线制作</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='5' y='3' width='22' height='26' rx='5' fill='%23FFFDF8' stroke='%23FF8A3D' stroke-width='2.5'/%3E%3Cpath d='M10 10h12M10 15h12M10 20h8' stroke='%23FF8A3D' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='23' r='5.5' fill='%232FBF9B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/workshop.css?v=20260814" id="ui-theme-style">
 <link rel="stylesheet" href="css/templates.css">
 <link rel="stylesheet" href="css/print.css">
 </head>
@@ -29,6 +30,15 @@
       <div class="segmented" id="view-switch">
         <button class="seg-btn active" data-view="editor">编辑器</button>
         <button class="seg-btn" data-view="apps">投递看板</button>
+      </div>
+    </div>
+
+    <div class="topbar-group ui-theme-group" aria-label="界面主题">
+      <span class="toolbar-label mono">界面</span>
+      <div class="segmented" id="ui-theme-switch">
+        <button class="seg-btn active" type="button" data-ui-theme="workshop" title="裁纸工坊">裁纸</button>
+        <button class="seg-btn" type="button" data-ui-theme="playful" title="元气贴纸">贴纸</button>
+        <button class="seg-btn" type="button" data-ui-theme="liquid-glass" title="Liquid Glass">Liquid</button>
       </div>
     </div>
 
@@ -241,5 +251,6 @@
 <script src="js/checklist.js"></script>
 <script src="js/apps.js"></script>
 <script src="js/app.js"></script>
+<script src="js/themes.js?v=20260814"></script>
 </body>
 </html>

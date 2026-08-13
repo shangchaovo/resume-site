@@ -49,14 +49,46 @@ try:
         check("陈晓雨" in page.locator("#resume-sheet .r-name").inner_text(), "首屏示例渲染")
         check("1 页" in page.locator("#page-badge").inner_text(), "首屏 1 页")
         check("已保存" in page.locator("#save-text").inner_text(), "初始保存徽章=已保存")
-        # 桌面顶栏不能被横向裁切（v2 曾把导出按钮挤出右边界）
-        eb = page.locator("#btn-export-pdf").bounding_box()
-        check(eb is not None and eb["x"] >= 0 and eb["x"] + eb["width"] <= 1440, "桌面导出按钮未被横向裁切")
+        # 桌面顶栏不能被横向裁切（新增界面主题后仍要在常见宽度可达）
+        for width in (1024, 1280, 1440):
+            page.set_viewport_size({"width": width, "height": 900}); page.wait_for_timeout(150)
+            eb = page.locator("#btn-export-pdf").bounding_box()
+            check(eb is not None and eb["x"] >= 0 and eb["x"] + eb["width"] <= width,
+                  f"{width}px 桌面导出按钮未被横向裁切")
+        page.set_viewport_size({"width": 1440, "height": 900})
         check(page.locator(".check-row.fail").count() == 0, "示例数据清单全绿")
+
+        # 三套界面主题：只换外壳，不影响同一份 Store / 点选编辑埋点
+        draft_id = page.evaluate("()=>Store.currentId()")
+        ped_count = page.locator("#resume-sheet .ped").count()
+        page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]'); page.wait_for_timeout(500)
+        check(page.get_attribute("html", "data-ui-theme") == "liquid-glass", "切换 Liquid Glass")
+        check("blur" in page.evaluate("()=>getComputedStyle(document.querySelector('.topbar')).backdropFilter"), "Liquid Glass 玻璃模糊生效")
+        liquid_course = page.locator('#resume-sheet .ped[data-edit^="education."][data-edit$=".courses"]').first
+        liquid_course.click(); page.wait_for_timeout(250)
+        check(page.locator(".pe-pop").is_visible(), "Liquid Glass 下点选编辑弹层可用")
+        page.screenshot(path="/tmp/crb_liquid_glass_edit.png")
+        page.locator(".pe-cancel").click(); page.wait_for_timeout(150)
+        page.click('#ui-theme-switch [data-ui-theme="playful"]'); page.wait_for_timeout(300)
+        check(page.get_attribute("html", "data-ui-theme") == "playful", "切换元气贴纸")
+        page.click('#ui-theme-switch [data-ui-theme="workshop"]'); page.wait_for_timeout(300)
+        check(page.get_attribute("html", "data-ui-theme") == "workshop", "切回裁纸工坊")
+        check(page.evaluate("()=>Store.currentId()") == draft_id and page.locator("#resume-sheet .ped").count() == ped_count,
+              "主题切换不改变草稿与点选编辑能力")
 
         # 输入同步
         page.fill('[data-path="basics.name"]', "王大锤"); page.wait_for_timeout(600)
         check("王大锤" in page.locator("#resume-sheet .r-name").inner_text(), "输入同步到预览")
+
+        # 右侧简历点选即改：弹层、数据写入、左侧表单同步完整闭环
+        course = page.locator('#resume-sheet .ped[data-edit^="education."][data-edit$=".courses"]').first
+        course.click(); page.wait_for_timeout(250)
+        check(page.locator(".pe-pop").is_visible(), "点选简历文字打开编辑弹层")
+        page.locator(".pe-input").fill("数据结构、操作系统、编译原理")
+        page.locator(".pe-ok").click(); page.wait_for_timeout(450)
+        check("编译原理" in page.locator("#resume-sheet .r-courses").first.inner_text(), "点选编辑同步到简历预览")
+        left_course = page.locator('[data-path^="education."][data-path$=".courses"]').first
+        check("编译原理" in left_course.input_value(), "点选编辑同步回左侧表单")
 
         # 模板切换 + 学术 1 页（间距收紧修复）
         page.click('#tpl-switch [data-tpl="classic"]'); page.wait_for_timeout(400)
