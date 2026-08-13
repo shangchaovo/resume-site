@@ -61,7 +61,9 @@ try:
         # 三套界面主题：只换外壳，不影响同一份 Store / 点选编辑埋点
         draft_id = page.evaluate("()=>Store.currentId()")
         ped_count = page.locator("#resume-sheet .ped").count()
-        page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]'); page.wait_for_timeout(500)
+        page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]')
+        page.wait_for_function("""()=>document.documentElement.dataset.uiTheme === 'liquid-glass'
+          && document.getElementById('ui-theme-style').getAttribute('href').includes('liquid-glass.css')""")
         check(page.get_attribute("html", "data-ui-theme") == "liquid-glass", "切换 Liquid Glass")
         check("blur" in page.evaluate("()=>getComputedStyle(document.querySelector('.topbar')).backdropFilter"), "Liquid Glass 玻璃模糊生效")
         check(page.evaluate("()=>getComputedStyle(document.querySelector('.card')).backdropFilter") == "none",
@@ -75,12 +77,29 @@ try:
         check(page.locator(".pe-pop").is_visible(), "Liquid Glass 下点选编辑弹层可用")
         page.screenshot(path="/tmp/crb_liquid_glass_edit.png")
         page.locator(".pe-cancel").click(); page.wait_for_timeout(150)
-        page.click('#ui-theme-switch [data-ui-theme="playful"]'); page.wait_for_timeout(300)
+        page.click('#ui-theme-switch [data-ui-theme="playful"]')
+        page.wait_for_function("""()=>document.documentElement.dataset.uiTheme === 'playful'
+          && document.getElementById('ui-theme-style').getAttribute('href').includes('playful.css')""")
         check(page.get_attribute("html", "data-ui-theme") == "playful", "切换元气贴纸")
-        page.click('#ui-theme-switch [data-ui-theme="workshop"]'); page.wait_for_timeout(300)
+        page.click('#ui-theme-switch [data-ui-theme="workshop"]')
+        page.wait_for_function("""()=>document.documentElement.dataset.uiTheme === 'workshop'
+          && document.getElementById('ui-theme-style').getAttribute('href').includes('workshop.css')""")
         check(page.get_attribute("html", "data-ui-theme") == "workshop", "切回裁纸工坊")
         check(page.evaluate("()=>Store.currentId()") == draft_id and page.locator("#resume-sheet .ped").count() == ped_count,
               "主题切换不改变草稿与点选编辑能力")
+
+        # 连续点按主题：旧请求不得覆盖最后一次选择，也不能出现未样式化顶栏。
+        page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]')
+        page.click('#ui-theme-switch [data-ui-theme="playful"]')
+        page.click('#ui-theme-switch [data-ui-theme="workshop"]')
+        page.wait_for_timeout(700)
+        check(page.get_attribute("html", "data-ui-theme") == "workshop"
+              and "workshop.css" in page.get_attribute("#ui-theme-style", "href"),
+              "快速切换以最后一次主题选择为准")
+        check(page.evaluate("""()=>{const topbar=getComputedStyle(document.querySelector('.topbar'));
+          const active=document.querySelectorAll('link[data-ui-theme-active]').length;
+          return topbar.display==='flex' && topbar.minHeight!=='0px' && active===1;}"""),
+              "快速切换全程保留完整界面样式")
 
         # 输入同步
         page.fill('[data-path="basics.name"]', "王大锤"); page.wait_for_timeout(600)
