@@ -72,6 +72,13 @@ try:
           const s=getComputedStyle(el); return s.display!=='none' && s.backdropFilter && s.backdropFilter!=='none';
         }).length""")
         check(blurred_layers <= 3, f"Liquid Glass 常驻模糊层受控（{blurred_layers} 层）")
+        project_entry = page.locator('[data-sec="projects"] .entry').first
+        check(project_entry.count() == 1 and page.evaluate("""()=>{const e=document.querySelector('[data-sec="projects"] .entry');
+          const s=getComputedStyle(e), head=getComputedStyle(e.querySelector('.entry-bar'));
+          return s.borderRadius==='14px' && s.backdropFilter==='none' && s.backgroundImage.includes('linear-gradient')
+            && head.backgroundImage.includes('linear-gradient');}"""),
+              "Liquid Glass 经历条目分层为独立玻璃模块")
+        project_entry.screenshot(path="/tmp/crb_liquid_glass_entry.png")
         liquid_course = page.locator('#resume-sheet .ped[data-edit^="education."][data-edit$=".courses"]').first
         liquid_course.click(); page.wait_for_timeout(250)
         check(page.locator(".pe-pop").is_visible(), "Liquid Glass 下点选编辑弹层可用")

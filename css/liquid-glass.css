@@ -4,7 +4,7 @@
    实时模糊只用于少量悬浮层，避免大量合成层卡顿。
    仅改变编辑器外壳；简历正文仍由 templates.css 独立控制。
    ========================================================================== */
-@import url("./workshop.css?v=20260814d");
+@import url("./workshop.css?v=20260814e");
 
 :root {
   --mat: #fff;
@@ -197,24 +197,135 @@ body::before {
 .kanban-col,
 .app-card {
   background:
-    linear-gradient(112deg, rgba(255, 255, 255, .95) 0%, rgba(255, 255, 255, .72) 32%, rgba(255, 255, 255, .42) 50%, rgba(255, 255, 255, .77) 70%, rgba(255, 255, 255, .91) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, .91), rgba(235, 235, 239, .50));
-  border-color: rgba(255, 255, 255, .92);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .025), 0 9px 24px rgba(17, 17, 19, .035), inset 0 1px 0 rgba(255, 255, 255, .98), inset 0 -1px 0 rgba(0, 0, 0, .025);
+    radial-gradient(125% 78% at -10% -38%, rgba(255, 255, 255, .98) 0 28%, rgba(255, 255, 255, .48) 57%, transparent 74%),
+    linear-gradient(110deg, rgba(255, 255, 255, .86) 0%, rgba(241, 249, 255, .54) 28%, rgba(255, 255, 255, .32) 48%, rgba(237, 246, 252, .48) 71%, rgba(255, 255, 255, .86) 100%),
+    linear-gradient(145deg, rgba(255, 255, 255, .83), rgba(218, 227, 235, .38));
+  border-color: rgba(255, 255, 255, .94);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .028), 0 12px 28px rgba(17, 17, 19, .055), inset 0 1px 0 rgba(255, 255, 255, 1), inset 1px 0 0 rgba(255, 255, 255, .72), inset 0 -1px 0 rgba(114, 133, 150, .11);
 }
 .checklist-card,
 .jd-card,
 .section-card:nth-child(3n+1),
 .section-card:nth-child(3n+2),
-.section-card:nth-child(3n) { background: #fff; }
+.section-card:nth-child(3n) {
+  background:
+    radial-gradient(130% 90% at 0% 0%, rgba(255, 255, 255, 1) 0 29%, rgba(255, 255, 255, .48) 61%, transparent 80%),
+    linear-gradient(112deg, rgba(255, 255, 255, .88) 0%, rgba(238, 247, 253, .48) 31%, rgba(255, 255, 255, .35) 52%, rgba(230, 240, 247, .40) 73%, rgba(255, 255, 255, .84) 100%),
+    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(220, 228, 235, .42));
+}
+.section-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 19px;
+}
+.section-card::before,
+.entry::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 1px;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, .64) 0 8%, rgba(255, 255, 255, 0) 24% 45%, rgba(255, 255, 255, .32) 55%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, 0) 24%);
+  opacity: .9;
+}
+.section-card > *,
+.entry > * { position: relative; z-index: 1; }
+.section-head {
+  min-height: 48px;
+  padding: 12px 13px;
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .10) 42%, rgba(255, 255, 255, .45) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, .62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .64), inset 0 -1px 0 rgba(111, 130, 146, .055);
+}
+.section-head:hover {
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, .82), rgba(247, 252, 255, .36) 42%, rgba(255, 255, 255, .72) 100%);
+}
+.section-num {
+  padding: 2px 6px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(221, 231, 239, .60));
+  border-color: rgba(255, 255, 255, .92);
+  box-shadow: 0 2px 6px rgba(44, 62, 80, .08), inset 0 1px 0 #fff;
+}
+.section-title { font-weight: 700; letter-spacing: .1px; }
+.section-toggle-vis,
+.section-chevron { text-shadow: 0 1px 0 #fff; }
+.section-body {
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .28));
+}
+.section-card.collapsed .section-head { border-bottom-color: transparent; }
+.section-card.collapsed .section-body { padding-top: 0; padding-bottom: 0; }
+.section-body-inner { display: grid; gap: 10px; }
+.section-body-inner > .entry { margin: 0; }
+
+/* 每条经历是外层模块内独立的透明玻璃单元，不启用实时模糊。 */
+.entry {
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 14px;
+  padding: 11px;
+  border-color: rgba(255, 255, 255, .92);
+  box-shadow: 0 1px 1px rgba(17, 17, 19, .035), 0 8px 18px rgba(51, 71, 91, .065), inset 0 1px 0 rgba(255, 255, 255, .98), inset 0 -1px 0 rgba(112, 132, 150, .12);
+}
+.entry:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 3px rgba(17, 17, 19, .04), 0 14px 26px rgba(51, 71, 91, .09), inset 0 1px 0 #fff, inset 0 -1px 0 rgba(112, 132, 150, .12);
+}
+.entry-bar {
+  min-height: 32px;
+  padding: 5px 7px;
+  margin: -2px -2px 10px;
+  border: 1px solid rgba(255, 255, 255, .80);
+  border-radius: 10px;
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, .70), rgba(238, 247, 254, .30) 48%, rgba(255, 255, 255, .62));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .88), inset 0 -1px 0 rgba(103, 124, 141, .07);
+}
+.entry-label { color: #383b40; font-weight: 700; }
+.entry-handle { opacity: .34; }
+.entry-move,
+.entry-del {
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+.entry:hover .entry-handle { opacity: .72; }
+.entry-move:hover,
+.entry-del:hover {
+  border-color: rgba(255, 255, 255, .88);
+  background: rgba(255, 255, 255, .64);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.entry .field input,
+.entry .field textarea,
+.entry .field select {
+  background: linear-gradient(140deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, .40));
+  border-color: rgba(255, 255, 255, .78);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .94), inset 0 -1px 0 rgba(107, 126, 143, .06);
+}
+.entry .field input:focus,
+.entry .field textarea:focus,
+.entry .field select:focus {
+  background: rgba(255, 255, 255, .90);
+}
+.section-body-inner > .btn-add {
+  margin-top: -2px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, .80);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .52), rgba(235, 244, 250, .35));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .86), inset 0 -1px 0 rgba(107, 126, 143, .06);
+}
 .section-card:hover,
-.entry:hover,
 .app-card:hover {
   border-color: rgba(255, 255, 255, 1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, .035), 0 15px 32px rgba(17, 17, 19, .065), inset 0 1px 0 #fff;
 }
-.section-head:hover { background: linear-gradient(90deg, rgba(255, 255, 255, .15), rgba(255, 255, 255, .78), rgba(255, 255, 255, .18)); }
-.section-num,
 .guide-num {
   color: #1d1d1f;
   background: #ededf0;
