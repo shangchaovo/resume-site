@@ -66,6 +66,8 @@ try:
           && document.getElementById('ui-theme-style').getAttribute('href').includes('liquid-glass.css')""")
         check(page.get_attribute("html", "data-ui-theme") == "liquid-glass", "切换 Liquid Glass")
         check("blur" in page.evaluate("()=>getComputedStyle(document.querySelector('.topbar')).backdropFilter"), "Liquid Glass 玻璃模糊生效")
+        check("rgb(21, 148, 255)" in page.evaluate("()=>getComputedStyle(document.querySelector('#btn-export-pdf')).backgroundImage"),
+              "Liquid Glass 导出主操作使用苹果亮蓝")
         check(page.evaluate("()=>getComputedStyle(document.querySelector('.card')).backdropFilter") == "none",
               "Liquid Glass 普通卡片不创建模糊合成层")
         blurred_layers = page.evaluate("""()=>[...document.querySelectorAll('body *')].filter(el=>{
