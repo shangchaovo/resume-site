@@ -6,7 +6,7 @@
   'use strict';
 
   var STORAGE_KEY = 'crb:ui-theme';
-  var VERSION = '20260814b';
+  var VERSION = '20260814c';
   var FILES = {
     workshop: 'workshop.css',
     playful: 'playful.css',
