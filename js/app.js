@@ -308,18 +308,21 @@
     });
   }
 
-  /* ---------------- 视图切换：编辑器 / 投递看板 ---------------- */
+  /* ---------------- 视图切换：编辑器 / 投递看板 / 支持与反馈 ---------------- */
 
   function setView(view) {
     var isApps = view === 'apps';
-    document.querySelector('.workbench').hidden = isApps;
+    var isSupport = view === 'support';
+    document.querySelector('.workbench').hidden = isApps || isSupport;
     $('apps-view').hidden = !isApps;
+    $('support-view').hidden = !isSupport;
     document.querySelector('.app').classList.toggle('view-apps', isApps);
+    document.querySelector('.app').classList.toggle('view-support', isSupport);
     document.querySelectorAll('#view-switch .seg-btn').forEach(function (b) {
       b.classList.toggle('active', b.dataset.view === view);
     });
     if (isApps) window.Apps.render();
-    else window.Preview.fit();
+    else if (!isSupport) window.Preview.fit();
   }
   function wireView() {
     document.querySelectorAll('#view-switch .seg-btn').forEach(function (b) {
@@ -356,6 +359,7 @@
     wireKeys();
     wireFilename();
     window.Apps.wireModal();
+    window.Support.wire();
     wireView();
     wireLogApp();
 

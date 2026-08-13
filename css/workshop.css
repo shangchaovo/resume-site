@@ -910,10 +910,11 @@ body {
    投递看板 + 模态框 + 视图切换
    ========================================================================== */
 
-.app.view-apps .editor-only { display: none !important; }
+.app.view-apps .editor-only,
+.app.view-support .editor-only { display: none !important; }
 
 /* 作者 display 规则会盖掉 UA 的 [hidden]，这里显式恢复隐藏语义 */
-.workbench[hidden], .apps-view[hidden] { display: none !important; }
+.workbench[hidden], .apps-view[hidden], .support-view[hidden] { display: none !important; }
 
 .apps-view {
   flex: 1; display: flex; flex-direction: column; min-height: 0;
@@ -982,6 +983,109 @@ body {
 .app-edit:hover { background: var(--accent-soft); color: var(--accent); }
 .app-del:hover { background: var(--stamp-soft); color: var(--stamp); }
 
+/* ----------------------------- 支持与反馈页 ----------------------------- */
+
+.support-view {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: clamp(22px, 4vw, 54px);
+  background: linear-gradient(145deg, rgba(253, 253, 251, .72), rgba(231, 235, 228, .40));
+}
+.support-shell { width: min(100%, 980px); margin: 0 auto; }
+.support-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(28px, 5vw, 48px);
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-top: 4px solid var(--accent);
+  box-shadow: var(--shadow-pop);
+}
+.support-hero::after {
+  content: "";
+  position: absolute;
+  right: -80px; top: -128px;
+  width: 280px; height: 280px;
+  border: 1px solid var(--panel-edge-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px var(--accent-faint), 0 0 0 36px rgba(255,255,255,.45);
+  pointer-events: none;
+}
+.support-hero-copy { position: relative; z-index: 1; max-width: 630px; }
+.support-eyebrow,
+.support-kicker {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+}
+.support-hero h2 { margin: 8px 0 10px; font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); line-height: 1; }
+.support-hero p { max-width: 570px; color: var(--ink-2); font-size: 14px; line-height: 1.75; }
+.support-hero-mark {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 74px; height: 74px;
+  display: grid; place-items: center;
+  background: var(--accent-faint);
+  border: 1px solid var(--panel-edge-strong);
+  border-radius: 50%;
+  font-size: 32px;
+  box-shadow: var(--shadow-paper);
+}
+.support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.support-card {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(22px, 3vw, 32px);
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  box-shadow: var(--shadow-paper);
+}
+.support-coffee-card { border-top: 3px solid var(--accent); }
+.support-feedback-card { border-top: 3px solid var(--stamp); }
+.support-card h3 { margin: 10px 0 9px; font-family: var(--font-display); font-size: 22px; }
+.support-card p { margin-bottom: 20px; color: var(--ink-2); font-size: 13px; line-height: 1.7; }
+.support-primary,
+.support-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-decoration: none;
+}
+.support-primary { margin-top: auto; background: var(--accent); color: #fff; border-color: var(--accent); }
+.support-primary:hover { color: #fff; background: var(--accent-hover); }
+.support-text-action {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+.support-text-action:hover { color: var(--accent); text-decoration: underline; }
+.support-email {
+  margin: auto 0 16px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: clamp(14px, 2vw, 17px);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+.support-email:hover { color: var(--accent); }
+.support-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.support-note { margin: 18px 0 0; color: var(--ink-3); font-size: 10px; letter-spacing: .25px; text-align: center; }
+
 .modal-scrim {
   position: fixed; inset: 0; background: rgba(31, 36, 32, .4);
   z-index: 70; opacity: 0; transition: opacity .25s;
@@ -1009,6 +1113,10 @@ body {
 @media (max-width: 980px) {
   .apps-view { padding: 12px; overflow: auto; }
   .kanban { grid-auto-columns: 80vw; }
+  .support-view { padding: 16px 12px 30px; }
+  .support-hero { align-items: flex-start; }
+  .support-grid { grid-template-columns: 1fr; }
+  .support-card { min-height: 0; }
 }
 
 /* ----------------------- 预览点选编辑（SheetEdit） ----------------------- */

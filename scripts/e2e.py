@@ -218,6 +218,27 @@ try:
         page.click('#view-switch [data-view="editor"]'); page.wait_for_timeout(300)
         check(page.locator(".workbench").is_visible() and page.locator("#apps-view").is_hidden(), "切回编辑器视图")
 
+        # ---- 集群：支持与反馈页 ----
+        page.click('#view-switch [data-view="support"]'); page.wait_for_timeout(300)
+        check(page.locator("#support-view").is_visible() and page.locator(".workbench").is_hidden()
+              and page.locator("#apps-view").is_hidden(), "切换到支持与反馈页面")
+        check(page.get_attribute("#support-bmc-link", "href") == "https://buymeacoffee.com/chasetse"
+              and page.get_attribute("#support-email-link", "href").startswith("mailto:shangchaoxie888@gmail.com"),
+              "支持链接与反馈邮箱正确")
+        check(page.locator("#btn-copy-support-link").is_visible() and page.locator("#btn-copy-support-email").is_visible(),
+              "支持页提供复制链接和邮箱操作")
+        page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]')
+        page.wait_for_function("""()=>document.documentElement.dataset.uiTheme === 'liquid-glass'
+          && document.getElementById('ui-theme-style').getAttribute('href').includes('liquid-glass.css')""")
+        check(page.evaluate("""()=>{const s=getComputedStyle(document.querySelector('.support-card'));
+          return s.backgroundImage.includes('linear-gradient') && s.backdropFilter==='none';}"""),
+              "支持页匹配 Liquid Glass 且不增加卡片模糊层")
+        page.screenshot(path="/tmp/crb_support_liquid.png")
+        page.click('#view-switch [data-view="editor"]'); page.wait_for_timeout(300)
+        page.click('#ui-theme-switch [data-ui-theme="workshop"]')
+        page.wait_for_function("""()=>document.documentElement.dataset.uiTheme === 'workshop'
+          && document.getElementById('ui-theme-style').getAttribute('href').includes('workshop.css')""")
+
         # 移动端
         m = browser.new_context(viewport={"width": 390, "height": 800})
         mp = m.new_page(); mp.goto(BASE); mp.wait_for_load_state("networkidle"); mp.wait_for_timeout(600)

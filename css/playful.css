@@ -1015,10 +1015,11 @@ body {
    投递看板 + 模态框 + 视图切换
    ========================================================================== */
 
-.app.view-apps .editor-only { display: none !important; }
+.app.view-apps .editor-only,
+.app.view-support .editor-only { display: none !important; }
 
 /* 作者 display 规则会盖掉 UA 的 [hidden]，这里显式恢复隐藏语义 */
-.workbench[hidden], .apps-view[hidden] { display: none !important; }
+.workbench[hidden], .apps-view[hidden], .support-view[hidden] { display: none !important; }
 
 .apps-view {
   flex: 1; display: flex; flex-direction: column; min-height: 0;
@@ -1095,6 +1096,45 @@ body {
 .app-edit:hover { background: var(--mint-soft); color: var(--mint-deep); }
 .app-del:hover { background: var(--stamp-soft); color: var(--stamp); }
 
+/* ----------------------------- 支持与反馈页 ----------------------------- */
+
+.support-view {
+  flex: 1; min-height: 0; overflow: auto; padding: clamp(22px, 4vw, 54px);
+  background:
+    radial-gradient(var(--mat-dot) 2px, transparent 2px) 0 0 / 28px 28px,
+    linear-gradient(145deg, var(--lemon-soft), var(--sky-soft));
+}
+.support-shell { width: min(100%, 980px); margin: 0 auto; }
+.support-hero {
+  position: relative; overflow: hidden; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  padding: clamp(28px, 5vw, 48px); background: var(--panel); border: 4px solid var(--line); border-top-color: var(--orange);
+  border-radius: var(--radius-lg); box-shadow: var(--pop-lg), 0 22px 40px -20px rgba(59,43,32,.42);
+}
+.support-hero::after {
+  content: ""; position: absolute; right: -80px; top: -128px; width: 280px; height: 280px;
+  border: 4px solid var(--line); border-radius: 50%; box-shadow: 0 0 0 18px var(--mint-soft), 0 0 0 36px var(--lilac-soft); pointer-events: none;
+}
+.support-hero-copy { position: relative; z-index: 1; max-width: 630px; }
+.support-eyebrow, .support-kicker { display: inline-block; color: var(--orange-deep); font-size: 10px; font-weight: 800; letter-spacing: 1.4px; }
+.support-hero h2 { margin: 8px 0 10px; font-family: var(--font-display); font-size: clamp(30px, 4vw, 44px); line-height: 1; }
+.support-hero p { max-width: 570px; color: var(--ink-2); font-size: 14px; font-weight: 600; line-height: 1.75; }
+.support-hero-mark { position: relative; z-index: 1; flex: 0 0 auto; width: 78px; height: 78px; display: grid; place-items: center; background: var(--lemon-soft); border: 3px solid var(--line); border-radius: 50%; font-size: 34px; box-shadow: var(--pop); }
+.support-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.support-card { min-height: 278px; display: flex; flex-direction: column; align-items: flex-start; padding: clamp(22px, 3vw, 32px); border: 3px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--pop); }
+.support-coffee-card { background: linear-gradient(145deg, var(--sky-soft), #fff 58%); border-top-color: var(--sky); }
+.support-feedback-card { background: linear-gradient(145deg, var(--mint-soft), #fff 58%); border-top-color: var(--mint); }
+.support-card h3 { margin: 10px 0 9px; font-family: var(--font-display); font-size: 24px; }
+.support-card p { margin-bottom: 20px; color: var(--ink-2); font-size: 13px; font-weight: 600; line-height: 1.7; }
+.support-primary, .support-actions .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
+.support-primary { margin-top: auto; background: var(--sky); color: #fff; border-color: var(--line); }
+.support-primary:hover { color: #fff; background: #67bcf7; }
+.support-text-action { margin-top: 14px; padding: 0; border: none; background: transparent; color: var(--ink-2); font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; }
+.support-text-action:hover { color: var(--sky-deep); text-decoration: underline; }
+.support-email { margin: auto 0 18px; color: var(--ink); font-family: var(--font-mono); font-size: clamp(14px, 2vw, 17px); font-weight: 700; text-decoration: none; border-bottom: 3px solid var(--mint); }
+.support-email:hover { color: var(--mint-deep); }
+.support-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.support-note { margin: 20px 0 0; color: var(--ink-2); font-size: 10px; font-weight: 700; letter-spacing: .25px; text-align: center; }
+
 .modal-scrim {
   position: fixed; inset: 0; background: rgba(59, 43, 32, .45);
   z-index: 70; opacity: 0; transition: opacity .25s;
@@ -1125,6 +1165,10 @@ body {
 @media (max-width: 980px) {
   .apps-view { padding: 12px; overflow: auto; }
   .kanban { grid-auto-columns: 80vw; }
+  .support-view { padding: 16px 12px 30px; }
+  .support-hero { align-items: flex-start; }
+  .support-grid { grid-template-columns: 1fr; }
+  .support-card { min-height: 0; }
 }
 
 /* ==========================================================================

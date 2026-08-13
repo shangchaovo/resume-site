@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-<link rel="preload" href="css/playful.css?v=20260814f" as="style">
-<link rel="preload" href="css/liquid-glass.css?v=20260814f" as="style">
-<link rel="stylesheet" href="css/workshop.css?v=20260814f" id="ui-theme-style">
+<link rel="preload" href="css/playful.css?v=20260814g" as="style">
+<link rel="preload" href="css/liquid-glass.css?v=20260814g" as="style">
+<link rel="stylesheet" href="css/workshop.css?v=20260814g" id="ui-theme-style">
 <link rel="stylesheet" href="css/templates.css">
 <link rel="stylesheet" href="css/print.css">
 </head>
@@ -32,6 +32,7 @@
       <div class="segmented" id="view-switch">
         <button class="seg-btn active" data-view="editor">编辑器</button>
         <button class="seg-btn" data-view="apps">投递看板</button>
+        <button class="seg-btn" data-view="support">支持与反馈</button>
       </div>
     </div>
 
@@ -136,6 +137,42 @@
       <button class="btn stamp" id="btn-app-add">＋ 记一笔投递</button>
     </div>
     <div class="kanban" id="kanban"></div>
+  </section>
+
+  <section class="support-view" id="support-view" hidden aria-labelledby="support-title">
+    <div class="support-shell">
+      <header class="support-hero">
+        <div class="support-hero-copy">
+          <span class="support-eyebrow mono">RESUME FORGE · COMMUNITY</span>
+          <h2 id="support-title">支持与反馈</h2>
+          <p>如果这份工具帮你少走了一点简历弯路，欢迎请我喝杯咖啡；每一条建议也都会让它变得更好。</p>
+        </div>
+        <div class="support-hero-mark" aria-hidden="true">☕</div>
+      </header>
+
+      <div class="support-grid">
+        <article class="support-card support-coffee-card">
+          <span class="support-kicker mono">01 · SUPPORT</span>
+          <h3>请我喝杯咖啡</h3>
+          <p>通过 Buy Me a Coffee 支持后续维护、功能打磨与免费使用体验。</p>
+          <a class="btn support-primary" id="support-bmc-link" href="https://buymeacoffee.com/chasetse" target="_blank" rel="noopener noreferrer">在 Buy Me a Coffee 支持 <span aria-hidden="true">↗</span></a>
+          <button class="support-text-action" id="btn-copy-support-link" type="button">复制支持链接</button>
+        </article>
+
+        <article class="support-card support-feedback-card">
+          <span class="support-kicker mono">02 · FEEDBACK</span>
+          <h3>告诉我你的想法</h3>
+          <p>遇到问题、想要新功能，或只是想分享使用感受，都欢迎直接发邮件。</p>
+          <a class="support-email" id="support-email-link" href="mailto:shangchaoxie888@gmail.com?subject=Resume%20Forge%20%E6%84%8F%E8%A7%81%E5%8F%8D%E9%A6%88">shangchaoxie888@gmail.com</a>
+          <div class="support-actions">
+            <a class="btn ghost" id="support-compose-link" href="mailto:shangchaoxie888@gmail.com?subject=Resume%20Forge%20%E6%84%8F%E8%A7%81%E5%8F%8D%E9%A6%88">写邮件反馈</a>
+            <button class="btn ghost" id="btn-copy-support-email" type="button">复制邮箱</button>
+          </div>
+        </article>
+      </div>
+
+      <p class="support-note mono">感谢每一次支持与反馈 · 你的简历数据始终只保存在本机</p>
+    </div>
   </section>
 
   <div class="modal-scrim" id="app-scrim" hidden></div>
@@ -252,7 +289,8 @@
 <script src="js/jdmatch.js"></script>
 <script src="js/checklist.js"></script>
 <script src="js/apps.js"></script>
+<script src="js/support.js"></script>
 <script src="js/app.js"></script>
-<script src="js/themes.js?v=20260814f"></script>
+<script src="js/themes.js?v=20260814g"></script>
 </body>
 </html>
