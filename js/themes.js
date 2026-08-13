@@ -6,7 +6,7 @@
   'use strict';
 
   var STORAGE_KEY = 'crb:ui-theme';
-  var VERSION = '20260814';
+  var VERSION = '20260814b';
   var FILES = {
     workshop: 'workshop.css',
     playful: 'playful.css',
@@ -15,7 +15,7 @@
   var COLORS = {
     workshop: '#E7EBE4',
     playful: '#FFE7A8',
-    'liquid-glass': '#F4F7FA'
+    'liquid-glass': '#F5F5F7'
   };
 
   var style = document.getElementById('ui-theme-style');
@@ -29,7 +29,8 @@
 
   function applyTheme(theme) {
     var selected = normalize(theme);
-    style.href = 'css/' + FILES[selected] + '?v=' + VERSION;
+    var nextHref = 'css/' + FILES[selected] + '?v=' + VERSION;
+    if (style.getAttribute('href') !== nextHref) style.href = nextHref;
     document.documentElement.dataset.uiTheme = selected;
     if (browserColor) browserColor.content = COLORS[selected];
     switcher.querySelectorAll('[data-ui-theme]').forEach(function (button) {

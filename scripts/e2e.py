@@ -64,6 +64,12 @@ try:
         page.click('#ui-theme-switch [data-ui-theme="liquid-glass"]'); page.wait_for_timeout(500)
         check(page.get_attribute("html", "data-ui-theme") == "liquid-glass", "切换 Liquid Glass")
         check("blur" in page.evaluate("()=>getComputedStyle(document.querySelector('.topbar')).backdropFilter"), "Liquid Glass 玻璃模糊生效")
+        check(page.evaluate("()=>getComputedStyle(document.querySelector('.card')).backdropFilter") == "none",
+              "Liquid Glass 普通卡片不创建模糊合成层")
+        blurred_layers = page.evaluate("""()=>[...document.querySelectorAll('body *')].filter(el=>{
+          const s=getComputedStyle(el); return s.display!=='none' && s.backdropFilter && s.backdropFilter!=='none';
+        }).length""")
+        check(blurred_layers <= 3, f"Liquid Glass 常驻模糊层受控（{blurred_layers} 层）")
         liquid_course = page.locator('#resume-sheet .ped[data-edit^="education."][data-edit$=".courses"]').first
         liquid_course.click(); page.wait_for_timeout(250)
         check(page.locator(".pe-pop").is_visible(), "Liquid Glass 下点选编辑弹层可用")
