@@ -18,11 +18,27 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
+const ROOT = __dirname;
+
 function serveStatic(req, res) {
-  let pathname = req.url.split('?')[0];
+  let pathname;
+  try {
+    pathname = decodeURIComponent(req.url.split('?')[0]);
+  } catch (e) {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('Bad Request');
+    return;
+  }
   if (pathname === '/') pathname = '/index.html';
 
-  const filePath = path.join(__dirname, pathname);
+  // 解析到 ROOT 内；任何越出项目目录的路径（原始或 URL 编码的 ..）一律拒绝，防路径穿越
+  const filePath = path.resolve(ROOT, '.' + pathname);
+  if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('Forbidden');
+    return;
+  }
+
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 

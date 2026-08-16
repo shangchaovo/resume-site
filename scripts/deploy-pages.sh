@@ -11,6 +11,7 @@ export HTTPS_PROXY="$PROXY" HTTP_PROXY="$PROXY" NO_PROXY="${NO_PROXY:-localhost,
 
 D="$(mktemp -d)"; trap 'rm -rf "$D"' EXIT
 cp index.html "$D"/
+cp _headers "$D"/
 cp -r css js data "$D"/
 
 echo ">> deploying clean dir -> Cloudflare Pages [resume] ..."

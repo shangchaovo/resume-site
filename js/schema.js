@@ -67,15 +67,30 @@
     };
   }
 
+  /* 合并外部（导入的 JSON）对象时跳过危险键，防 __proto__/constructor 原型污染 */
+  var SKIP_KEYS = { '__proto__': true, 'constructor': true, 'prototype': true };
+  function safeAssign(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var src = arguments[i];
+      if (!src) continue;
+      for (var k in src) {
+        if (!Object.prototype.hasOwnProperty.call(src, k)) continue;
+        if (SKIP_KEYS[k]) continue;
+        target[k] = src[k];
+      }
+    }
+    return target;
+  }
+
   /* 深拷贝 + 结构归一：缺什么补什么，防止老数据/坏数据炸渲染 */
   function migrate(doc) {
     if (!doc || typeof doc !== 'object') return emptyResume();
     var base = emptyResume();
     var out = {
       schemaVersion: SCHEMA_VERSION,
-      meta: Object.assign({}, base.meta, doc.meta || {}),
-      settings: Object.assign({}, base.settings, doc.settings || {}),
-      resume: Object.assign({}, base.resume, doc.resume || {})
+      meta: safeAssign({}, base.meta, doc.meta),
+      settings: safeAssign({}, base.settings, doc.settings),
+      resume: safeAssign({}, base.resume, doc.resume)
     };
     if (!out.meta.id) out.meta.id = uid('d');
     if (!Array.isArray(out.settings.hiddenSections)) out.settings.hiddenSections = [];
@@ -84,14 +99,17 @@
     ['modern', 'classic', 'academic'].indexOf(out.settings.template) === -1 && (out.settings.template = 'modern');
     ['compact', 'standard', 'relaxed'].indexOf(out.settings.density) === -1 && (out.settings.density = 'standard');
     var r = out.resume;
-    r.basics = Object.assign({}, base.resume.basics, r.basics || {});
-    r.skills = Object.assign({}, base.resume.skills, r.skills || {});
+    r.basics = safeAssign({}, base.resume.basics, r.basics);
+    r.skills = safeAssign({}, base.resume.skills, r.skills);
+    /* 证件照只接受本机 data: 图（上传时已 canvas 压缩）；导入的外部 URL 一律丢弃，防追踪像素 */
+    if (r.basics.photo && !/^data:image\//i.test(r.basics.photo)) r.basics.photo = '';
     ['education', 'internships', 'projects', 'campus', 'honors', 'research', 'papers'].forEach(function (k) {
       if (!Array.isArray(r[k])) r[k] = [];
       r[k] = r[k].filter(function (e) { return e && typeof e === 'object'; })
         .map(function (e) {
-          var merged = Object.assign({}, emptyEntry(k), e);
-          if (!merged.id) merged.id = uid(k[0]);
+          var merged = safeAssign({}, emptyEntry(k), e);
+          /* id 只认 uid() 生成的安全形态；导入的恶意/畸形 id 一律重生成，防注入 data-edit 属性 */
+          if (!/^[a-z]_[a-z0-9]+$/i.test(merged.id || '')) merged.id = uid(k[0]);
           if (Array.isArray(e.bullets)) merged.bullets = e.bullets.map(String);
           return merged;
         });

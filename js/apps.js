@@ -12,7 +12,8 @@
   var dragId = null;
   var editingId = null;
 
-  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  /* 看板卡片拼进 innerHTML，需转义引号——JD 链接会进 href 属性，防引号闭合注入 */
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function today() { return new Date().toISOString().slice(0, 10); }
   function $(id) { return document.getElementById(id); }
 

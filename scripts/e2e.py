@@ -254,6 +254,27 @@ try:
         check(mp.locator(".preview-pane").is_visible() and not mp.locator("#form-pane").is_visible(), "移动端预览视图")
         m.close()
 
+        # ---- 集群：XSS 注入回归（导入恶意 JSON / 看板链接，应全部被无害化、不执行） ----
+        page.evaluate("""()=>{
+          const mal={meta:{name:'evil'},
+            settings:{template:'modern',theme:'navy',density:'standard',jd:'前端',
+              jdKeywords:['<img src=x onerror=window.__xss_jd=1>']},
+            resume:{basics:{name:'Attacker'},
+              internships:[{id:'\\"><img src=x onerror=window.__xss_id=1>',company:'EvilCo',role:'x',bullets:['做了优化，提升 100%']}]}};
+          Store.importJSON(JSON.stringify(mal));
+        }""")
+        page.wait_for_timeout(800)  # 给任何潜在 <img> onerror 留触发窗口
+        check(page.evaluate("()=>!(window.__xss_id||window.__xss_jd)"), "导入恶意 JSON 不执行注入脚本(entry.id / jdKeyword)")
+        check(page.evaluate("()=>document.querySelectorAll('#resume-sheet [onerror],#checklist-card [onerror]').length===0"),
+              "预览与清单无注入的事件处理器节点")
+        # 看板 JD 链接引号注入
+        page.evaluate("""()=>{localStorage.setItem('crb:apps',JSON.stringify([{id:'a1',company:'C',role:'R',date:'2026-01-01',
+          status:'已投',link:'https://x\\" onmouseover=window.__xss_link=1',draftId:'',draftName:'',note:''}]));Apps.render();}""")
+        check(page.evaluate("()=>{const a=document.querySelector('.app-card a');return a?a.getAttribute('onmouseover'):null}") is None,
+              "看板 JD 链接不允许 onmouseover 属性注入")
+        check(page.evaluate("()=>!(window.__xss_link)"), "看板链接注入脚本未执行")
+        page.evaluate("()=>localStorage.removeItem('crb:apps')")
+
         check(not errs, "无 JS 运行时/console 错误" + ("" if not errs else " :: " + " | ".join(errs)))
         browser.close()
 finally:

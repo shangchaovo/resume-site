@@ -19,9 +19,10 @@
   function ed(path, inner, opts) {
     opts = opts || {};
     var cls = 'ped' + (opts.b ? ' ped-b' : '');
-    var parts = opts.parts ? ' data-parts="' + opts.parts + '"' : '';
-    var k = opts.k ? ' data-k="' + opts.k + '"' : '';
-    return '<span class="' + cls + '" data-edit="' + path + '"' + parts + k + '>' + inner + '</span>';
+    var parts = opts.parts ? ' data-parts="' + esc(opts.parts) + '"' : '';
+    var k = opts.k ? ' data-k="' + esc(opts.k) + '"' : '';
+    /* path 含条目 id，必须转义（含引号），防导入的恶意 id 闭合 data-edit 注入 */
+    return '<span class="' + cls + '" data-edit="' + esc(path) + '"' + parts + k + '>' + inner + '</span>';
   }
   /* 组合字段：把若干子值各自包成可点，再整体标成 combo，路径指向条目级（如 internships.<id>） */
   function combo(id, partKeys, segs) {

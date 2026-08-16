@@ -10,6 +10,13 @@
   var manualState = {};   // 从 Store.getUI 恢复
   var currentPage = 1;
 
+  /* 拼进 innerHTML 的动态文本统一转义（含引号）——JD 关键词 tip 可含用户/导入数据 */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   var MANUAL = [
     { id: 'truth', text: '每条经历都真实、能在面试里被追问核验' },
     { id: 'relevant', text: '每条都与目标岗位相关（无关的果断删掉）' },
@@ -161,17 +168,17 @@
       var ok = !!info.ok;
       if (ok) passed++;
       return '<button class="check-row ' + (ok ? 'pass' : 'fail') + '"' +
-        (info.target ? ' data-target="' + info.target + '"' : '') + ' type="button">' +
+        (info.target ? ' data-target="' + esc(info.target) + '"' : '') + ' type="button">' +
         '<span class="check-icon">' + (ok ? '✓' : '!') + '</span>' +
-        '<span class="check-row-body"><span>' + r.text + '</span>' +
-        (!ok && info.tip ? '<span class="check-tip">' + info.tip + '</span>' : '') +
+        '<span class="check-row-body"><span>' + esc(r.text) + '</span>' +
+        (!ok && info.tip ? '<span class="check-tip">' + esc(info.tip) + '</span>' : '') +
         '</span></button>';
     }).join('');
 
     var manualDone = MANUAL.filter(function (m) { return manualState[m.id]; }).length;
     var manualRows = MANUAL.map(function (m) {
-      return '<button class="check-row manual-row' + (manualState[m.id] ? ' checked' : '') + '" data-manual="' + m.id + '" type="button">' +
-        '<span class="check-icon">✓</span><span class="check-row-body"><span>' + m.text + '</span></span></button>';
+      return '<button class="check-row manual-row' + (manualState[m.id] ? ' checked' : '') + '" data-manual="' + esc(m.id) + '" type="button">' +
+        '<span class="check-icon">✓</span><span class="check-row-body"><span>' + esc(m.text) + '</span></span></button>';
     }).join('');
 
     var pct = Math.round(passed / RULES.length * 100);
