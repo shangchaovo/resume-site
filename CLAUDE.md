@@ -71,4 +71,6 @@ python3 scripts/e2e.py         # 端到端验证（编辑→预览→PDF→移�
 
 已部署为 Cloudflare Pages 项目 `resume`，公网 **https://resume-5lv.pages.dev/**（免费、全球 CDN、Mac 关机也在）。`resume.pages.dev` 主机名被全局占用，故 CF 自动加 `-5lv`；项目名仍是 `resume`。要主机名恰好 `resume`：用其 Cloudflare 自有域名做 Pages 自定义域 `resume.<域名>`（同账号会自动建 DNS，免费即时）。
 
-重新部署：`bash scripts/deploy-pages.sh`。它把 `index.html + css/ js/ data/` 拷到临时目录再上传——**wrangler 直接上传不读 `.cloudflareignore`**，所以必须用干净目录法，否则 `server.js`/`.git`/`launchd`/文档会被传上公网（泄露本机路径）。`.cloudflareignore` 仅对 git-build 模式有意义。首次需 `npx wrangler login` 一次性授权。另：Pages 对不存在路径回退返回 `index.html`（200），故**别用「curl 某路径是否 200」判断文件是否泄露**，要看响应体或上传清单。
+重新部署：`bash scripts/deploy-pages.sh`。它把 `index.html + _headers + css/ js/ data/` 拷到临时目录再上传——**wrangler 直接上传不读 `.cloudflareignore`**，所以必须用干净目录法，否则 `server.js`/`.git`/`launchd`/文档会被传上公网（泄露本机路径）。`.cloudflareignore` 仅对 git-build 模式有意义。首次需 `npx wrangler login` 一次性授权。另：Pages 对不存在路径回退返回 `index.html`（200），故**别用「curl 某路径是否 200」判断文件是否泄露**，要看响应体或上传清单。
+
+**安全头 `_headers`**（2026-08-16 加）：仓库根的 `_headers` 会被一并上传，给整站上了严格 CSP（`script-src 'self'` 等）。**坑**：以后若新增任何第三方资源（外链 JS / 字体 / 图片 / API），必须先把对应源加进 `_headers` 的 CSP 白名单，否则被浏览器静默拦截、功能莫名失效。站内全是无内联脚本的外链 JS，故 `script-src 'self'` 安全；内联 `style="..."` 靠 `style-src 'unsafe-inline'` 放行。改 CSP 后部署并 `curl -sI` 确认头生效。
