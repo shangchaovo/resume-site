@@ -1,12 +1,18 @@
 # 简历工坊 Resume Forge
 
-面向**在校大学生**的纯前端简历制作工具 —— 打开网页就是编辑器，左边填表、右边实时看到一张 A4 简历，写完直接导出高清 PDF 去面试。
+面向**在校大学生**的纯前端简历制作工具：打开网页就是编辑器，左边填表、右边实时看到一张 A4 简历，写完直接导出高清 PDF 去面试。
+
+**线上站点：[resume-5lv.pages.dev](https://resume-5lv.pages.dev/)**
+
+Campus **resume builder** for Chinese university recruiting: live A4 preview, vector PDF export, no account, data stays in your browser.
 
 无需注册、无需联网（首屏字体走 CDN 但可降级）、数据全部存在你自己的浏览器里。
 
-![编辑器](https://img.shields.io/badge/纯前端-HTML·CSS·JS-17503F) ![端口](https://img.shields.io/badge/端口-8769-B3402A)
+![编辑器](https://img.shields.io/badge/纯前端-HTML·CSS·JS-17503F) ![线上](https://img.shields.io/badge/live-resume--5lv.pages.dev-B3402A)
 
----
+## 核心用处
+
+校招简历最常卡在三件事：一页纸排不下、经历写成「负责/参与」、导出 PDF 对不齐。这个站点就是为这三件事做的——所见即所得排 A4，空心句和完成度清单会提醒你改，浏览器原生打印导出矢量 PDF。
 
 ## 它能做什么
 
