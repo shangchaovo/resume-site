@@ -8,7 +8,7 @@
   'use strict';
 
   var STORAGE_KEY = 'crb:ui-theme';
-  var VERSION = '20260814h';
+  var VERSION = '20260922f';
   var FILES = {
     workshop: 'workshop.css',
     playful: 'playful.css',
@@ -17,7 +17,7 @@
   var COLORS = {
     workshop: '#E7EBE4',
     playful: '#FFE7A8',
-    'liquid-glass': '#F5F5F7'
+    'liquid-glass': '#FFFFFF'
   };
 
   var style = document.getElementById('ui-theme-style');

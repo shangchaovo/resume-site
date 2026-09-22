@@ -1,66 +1,62 @@
 /* ==========================================================================
    简历工坊 — Liquid Glass「浮光玻璃」
-   高亮无色玻璃：用透明度、折射高光、内描边与软阴影建立层次。
-   实时模糊只用于少量悬浮层，避免大量合成层卡顿。
+   白底上的玻璃：页面本身是白色，层次靠顶缘高光、底缘内阴影和软投影，
+   不再铺彩色光场。实时模糊只用于顶栏、预览工具条和少量弹层。
    仅改变编辑器外壳；简历正文仍由 templates.css 独立控制。
    ========================================================================== */
-@import url("./workshop.css?v=20260814h");
+@import url("./workshop.css?v=20260922f");
 
 :root {
   --mat: #fff;
   --mat-dot: rgba(255, 255, 255, .7);
-  --ruler: rgba(0, 0, 0, .10);
-  --panel: rgba(255, 255, 255, .78);
-  --panel-edge: rgba(255, 255, 255, .88);
-  --panel-edge-strong: rgba(0, 0, 0, .13);
+  --ruler: rgba(70, 96, 120, .16);
+  --panel: rgba(255, 255, 255, .62);
+  --panel-edge: rgba(255, 255, 255, .78);
+  --panel-edge-strong: rgba(60, 84, 108, .16);
   --ink: #1d1d1f;
-  --ink-2: #515154;
-  --ink-3: #86868b;
+  --ink-2: #3a3a3c;
+  --ink-3: #6e6e73;
   --accent: #1d1d1f;
   --accent-hover: #000;
-  --accent-soft: rgba(29, 29, 31, .10);
-  --accent-faint: rgba(255, 255, 255, .58);
+  --accent-soft: rgba(10, 132, 255, .14);
+  --accent-faint: rgba(255, 255, 255, .5);
   --stamp: #1d1d1f;
   --stamp-hover: #000;
   --stamp-soft: rgba(29, 29, 31, .08);
   --ok: #3a3a3c;
   --bad: #636366;
   --radius: 16px;
-  --shadow-paper: 0 1px 1px rgba(0, 0, 0, .025), 0 10px 30px rgba(17, 17, 19, .045), inset 0 1px 0 rgba(255, 255, 255, .98);
-  --shadow-pop: 0 30px 80px rgba(17, 17, 19, .15), 0 2px 10px rgba(17, 17, 19, .06), inset 0 1px 0 rgba(255, 255, 255, .98);
+  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, .72) 0%, rgba(255, 255, 255, .46) 100%);
+  --glass-sheen: radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, .78), transparent 46%);
+  --glass-rim:
+    inset 0 1px 0 rgba(255, 255, 255, .96),
+    inset 0 -1px 0 rgba(72, 98, 122, .14),
+    inset 1px 0 0 rgba(255, 255, 255, .38);
+  --shadow-paper: 0 1px 1px rgba(40, 60, 80, .04), 0 16px 40px rgba(40, 64, 90, .08), var(--glass-rim);
+  --shadow-pop: 0 28px 70px rgba(32, 52, 78, .16), 0 2px 10px rgba(32, 52, 78, .06), var(--glass-rim);
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
 }
 
+html { background: #fff; }
+
 body {
   color: var(--ink);
-  background:
-    radial-gradient(100% 50% at 50% -8%, #fff 0 47%, rgba(255, 255, 255, 0) 80%),
-    radial-gradient(60% 42% at 96% 10%, rgba(255, 255, 255, .98) 0 18%, rgba(245, 245, 247, .48) 57%, transparent 100%),
-    linear-gradient(145deg, #fff 0%, #fbfbfc 44%, #f2f2f4 100%);
+  background: #fff;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(48rem 16rem at 14% 0%, rgba(255, 255, 255, .96), transparent 68%),
-    radial-gradient(42rem 25rem at 100% 100%, rgba(255, 255, 255, .82), transparent 72%);
-}
-
-/* 只让两个固定顶层使用实时毛玻璃。 */
+/* 只让固定顶层使用实时毛玻璃，让光场在栏下被磨砂并略微增饱和。 */
 .topbar,
 .preview-toolbar {
   background:
-    linear-gradient(108deg, rgba(255, 255, 255, .96) 0%, rgba(255, 255, 255, .70) 28%, rgba(255, 255, 255, .48) 49%, rgba(255, 255, 255, .80) 72%, rgba(255, 255, 255, .94) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(238, 238, 242, .52));
-  border-color: rgba(255, 255, 255, .93);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 1), 0 12px 32px rgba(17, 17, 19, .045), inset 0 1px 0 rgba(255, 255, 255, .96), inset 0 -1px 0 rgba(0, 0, 0, .035);
-  backdrop-filter: blur(24px) saturate(125%) contrast(103%);
-  -webkit-backdrop-filter: blur(24px) saturate(125%) contrast(103%);
+    linear-gradient(180deg, rgba(255, 255, 255, .58) 0%, rgba(255, 255, 255, .28) 48%, rgba(244, 248, 252, .34) 100%);
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .92),
+    inset 0 -1px 0 rgba(80, 104, 128, .08),
+    0 10px 28px rgba(48, 72, 98, .06);
+  backdrop-filter: blur(28px) saturate(110%);
+  -webkit-backdrop-filter: blur(28px) saturate(110%);
 }
 
 .topbar { gap: 8px 12px; padding: 9px 16px; }
@@ -75,42 +71,34 @@ body::before {
 .draft-group { border-color: rgba(0, 0, 0, .08); }
 
 .form-pane {
-  background:
-    radial-gradient(135% 42% at 0% 0%, rgba(255, 255, 255, 1) 0 35%, transparent 74%),
-    linear-gradient(150deg, rgba(255, 255, 255, .90), rgba(244, 244, 247, .82));
-  border-right-color: rgba(255, 255, 255, .92);
-  box-shadow: 14px 0 30px rgba(17, 17, 19, .025), inset -1px 0 rgba(0, 0, 0, .025);
+  background: transparent;
+  border-right-color: rgba(255, 255, 255, .42);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .55);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 .apps-view {
-  background:
-    radial-gradient(120% 55% at 2% 0%, rgba(255, 255, 255, .98), transparent 70%),
-    linear-gradient(150deg, rgba(255, 255, 255, .78), rgba(245, 245, 247, .74));
+  background: linear-gradient(180deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .06));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
 /* 支持页：高亮冷白玻璃，和 Liquid 编辑器外壳保持同一套折射语言。 */
 .support-view {
-  background:
-    radial-gradient(62% 48% at 4% 0%, rgba(255, 255, 255, 1), transparent 72%),
-    radial-gradient(42% 36% at 96% 88%, rgba(255, 255, 255, .84), transparent 76%),
-    linear-gradient(145deg, rgba(255, 255, 255, .64), rgba(235, 238, 242, .58));
+  background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .04));
 }
 .support-hero,
 .support-card {
   background:
     radial-gradient(128% 90% at -8% -30%, rgba(255, 255, 255, 1) 0 31%, rgba(255, 255, 255, .48) 61%, transparent 80%),
-    linear-gradient(110deg, rgba(255, 255, 255, .90) 0%, rgba(239, 248, 255, .47) 31%, rgba(255, 255, 255, .32) 51%, rgba(230, 240, 248, .42) 73%, rgba(255, 255, 255, .89) 100%),
-    linear-gradient(145deg, rgba(255, 255, 255, .85), rgba(218, 228, 236, .42));
+    linear-gradient(180deg, rgba(255, 255, 255, .94), rgba(255, 255, 255, .78));
   border-color: rgba(255, 255, 255, .94);
   box-shadow: 0 1px 1px rgba(0, 0, 0, .03), 0 18px 42px rgba(44, 61, 79, .08), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 0 rgba(101, 122, 140, .10);
 }
 .support-hero { border-top-color: rgba(255, 255, 255, .98); }
-.support-hero::after { border-color: rgba(255, 255, 255, .78); box-shadow: 0 0 0 18px rgba(255, 255, 255, .31), 0 0 0 36px rgba(230, 242, 250, .24); }
-.support-hero-mark { background: linear-gradient(145deg, rgba(255, 255, 255, .96), rgba(222, 236, 247, .53)); border-color: rgba(255, 255, 255, .92); }
+.support-hero::after { border-color: rgba(255, 255, 255, .78); box-shadow: 0 0 0 18px rgba(255, 255, 255, .45), 0 0 0 36px rgba(0, 0, 0, .03); }
+.support-hero-mark { background: linear-gradient(145deg, #fff, rgba(255, 255, 255, .72)); border-color: rgba(255, 255, 255, .92); }
 .support-coffee-card,
 .support-feedback-card { border-top-color: rgba(255, 255, 255, .98); }
 .support-primary {
@@ -164,9 +152,10 @@ body::before {
 .pe-btn {
   color: var(--ink);
   background:
-    linear-gradient(112deg, rgba(255, 255, 255, .96) 0%, rgba(255, 255, 255, .72) 30%, rgba(255, 255, 255, .42) 50%, rgba(255, 255, 255, .78) 73%, rgba(255, 255, 255, .92) 100%),
-    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(234, 234, 238, .55));
-  border-color: rgba(255, 255, 255, .90);
+    var(--glass-sheen),
+    var(--glass-fill);
+  border-color: rgba(255, 255, 255, .7);
+  box-shadow: var(--glass-rim), 0 8px 20px rgba(48, 70, 96, .05);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -212,41 +201,35 @@ body::before {
 .swatch.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d1d1f; }
 
 .preview-pane::before {
-  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, .10) 0 1px, transparent 1px 20px);
-  opacity: .28;
+  background: repeating-linear-gradient(180deg, rgba(70, 96, 120, .22) 0 1px, transparent 1px 20px);
+  opacity: .22;
 }
 .preview-stage {
-  background:
-    radial-gradient(60% 42% at 50% 0%, rgba(255, 255, 255, 1), transparent 72%),
-    radial-gradient(42% 32% at 100% 100%, rgba(255, 255, 255, .80), transparent 75%),
-    linear-gradient(145deg, rgba(255, 255, 255, .42), rgba(236, 236, 240, .52));
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .sheet {
-  border: 1px solid rgba(255, 255, 255, .96);
-  border-radius: 20px;
-  box-shadow: 0 30px 76px rgba(17, 17, 19, .115), 0 5px 20px rgba(17, 17, 19, .055), inset 0 1px 0 rgba(255, 255, 255, .98);
+  border: 1px solid rgba(255, 255, 255, .92);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .8),
+    0 22px 50px rgba(36, 58, 84, .14),
+    0 4px 14px rgba(36, 58, 84, .06);
 }
 
 .card,
-.entry,
 .kanban-col,
 .app-card {
   background:
-    radial-gradient(125% 78% at -10% -38%, rgba(255, 255, 255, .98) 0 28%, rgba(255, 255, 255, .48) 57%, transparent 74%),
-    linear-gradient(110deg, rgba(255, 255, 255, .86) 0%, rgba(241, 249, 255, .54) 28%, rgba(255, 255, 255, .32) 48%, rgba(237, 246, 252, .48) 71%, rgba(255, 255, 255, .86) 100%),
-    linear-gradient(145deg, rgba(255, 255, 255, .83), rgba(218, 227, 235, .38));
-  border-color: rgba(255, 255, 255, .94);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .028), 0 12px 28px rgba(17, 17, 19, .055), inset 0 1px 0 rgba(255, 255, 255, 1), inset 1px 0 0 rgba(255, 255, 255, .72), inset 0 -1px 0 rgba(114, 133, 150, .11);
-}
-.checklist-card,
-.jd-card,
-.section-card:nth-child(3n+1),
-.section-card:nth-child(3n+2),
-.section-card:nth-child(3n) {
-  background:
-    radial-gradient(130% 90% at 0% 0%, rgba(255, 255, 255, 1) 0 29%, rgba(255, 255, 255, .48) 61%, transparent 80%),
-    linear-gradient(112deg, rgba(255, 255, 255, .88) 0%, rgba(238, 247, 253, .48) 31%, rgba(255, 255, 255, .35) 52%, rgba(230, 240, 247, .40) 73%, rgba(255, 255, 255, .84) 100%),
-    linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(220, 228, 235, .42));
+    linear-gradient(180deg, rgba(255, 255, 255, .88), rgba(255, 255, 255, 0) 16px),
+    var(--glass-sheen),
+    linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, .3));
+  border-color: rgba(255, 255, 255, .8);
+  box-shadow:
+    var(--glass-rim),
+    0 1px 0 rgba(255, 255, 255, .7),
+    0 16px 34px rgba(40, 68, 98, .1);
 }
 .section-card {
   position: relative;
@@ -259,23 +242,26 @@ body::before {
   content: "";
   position: absolute;
   pointer-events: none;
-  inset: 1px;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 56px;
   z-index: 0;
   border-radius: inherit;
-  background:
-    linear-gradient(112deg, rgba(255, 255, 255, .64) 0 8%, rgba(255, 255, 255, 0) 24% 45%, rgba(255, 255, 255, .32) 55%, rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, 0) 24%);
-  opacity: .9;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0));
+  -webkit-mask: none;
+  mask: none;
+  padding: 0;
+  opacity: 1;
 }
 .section-card > *,
 .entry > * { position: relative; z-index: 1; }
 .section-head {
   min-height: 48px;
   padding: 12px 13px;
-  background:
-    linear-gradient(105deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .10) 42%, rgba(255, 255, 255, .45) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, .62);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .64), inset 0 -1px 0 rgba(111, 130, 146, .055);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, .12));
+  border-bottom: 1px solid rgba(255, 255, 255, .5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75);
 }
 .section-head:hover {
   background:
@@ -292,7 +278,7 @@ body::before {
 .section-chevron { text-shadow: 0 1px 0 #fff; }
 .section-body {
   padding: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .28));
+  background: transparent;
 }
 .section-card.collapsed .section-head { border-bottom-color: transparent; }
 .section-card.collapsed .section-body { padding-top: 0; padding-bottom: 0; }
@@ -305,8 +291,11 @@ body::before {
   isolation: isolate;
   border-radius: 14px;
   padding: 11px;
-  border-color: rgba(255, 255, 255, .92);
-  box-shadow: 0 1px 1px rgba(17, 17, 19, .035), 0 8px 18px rgba(51, 71, 91, .065), inset 0 1px 0 rgba(255, 255, 255, .98), inset 0 -1px 0 rgba(112, 132, 150, .12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, 0) 12px),
+    linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, .22));
+  border-color: rgba(255, 255, 255, .82);
+  box-shadow: var(--glass-rim), 0 8px 18px rgba(48, 72, 98, .07);
 }
 .entry:hover {
   transform: translateY(-1px);
@@ -382,7 +371,7 @@ body::before {
 .jd-add:focus,
 .pe-input:focus {
   border-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 0 0 3px rgba(29, 29, 31, .11), inset 0 1px 0 #fff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, .28), inset 0 1px 0 #fff;
 }
 .btn-add { border-style: solid; color: #636366; box-shadow: none; }
 .btn-add:hover { color: #000; border-color: rgba(255, 255, 255, .98); background: linear-gradient(140deg, #fff, #f2f2f4); }
@@ -416,18 +405,16 @@ body::before {
 .modal,
 .pe-pop,
 .toast {
-  background:
-    linear-gradient(112deg, rgba(255, 255, 255, .98) 0%, rgba(255, 255, 255, .75) 34%, rgba(255, 255, 255, .46) 52%, rgba(255, 255, 255, .82) 74%, rgba(255, 255, 255, .95) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(235, 235, 239, .57));
-  border-color: rgba(255, 255, 255, .94);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .66));
+  border-color: rgba(255, 255, 255, .82);
   box-shadow: var(--shadow-pop);
 }
 .guide-drawer.open,
 .modal:not([hidden]),
 .pe-pop,
 .toast {
-  backdrop-filter: blur(22px) saturate(125%) contrast(103%);
-  -webkit-backdrop-filter: blur(22px) saturate(125%) contrast(103%);
+  backdrop-filter: blur(28px) saturate(110%);
+  -webkit-backdrop-filter: blur(28px) saturate(110%);
 }
 .scrim,
 .modal-scrim {
@@ -454,8 +441,8 @@ body::before {
 .kanban-col:nth-child(6n+5),
 .kanban-col:nth-child(6n+6) {
   background:
-    linear-gradient(112deg, rgba(255, 255, 255, .95) 0%, rgba(255, 255, 255, .72) 32%, rgba(255, 255, 255, .42) 50%, rgba(255, 255, 255, .77) 70%, rgba(255, 255, 255, .91) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, .91), rgba(235, 235, 239, .50));
+    var(--glass-sheen),
+    linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, .34));
 }
 .kanban-col.col-over { border-color: rgba(255, 255, 255, 1); background: linear-gradient(135deg, rgba(255, 255, 255, .98), rgba(237, 237, 242, .68)); }
 .app-draft { color: #515154; background: rgba(255, 255, 255, .70); border-color: rgba(255, 255, 255, .88); }
@@ -480,12 +467,17 @@ body::before {
   .topbar, .preview-toolbar, .guide-drawer, .modal, .pe-pop, .toast { background: #fff; }
 }
 
+@media print {
+  body::before,
+  body::after { display: none !important; }
+}
+
 @media (max-width: 980px) {
   .sticky-head {
-    background: linear-gradient(135deg, rgba(255, 255, 255, .88), rgba(255, 255, 255, .68));
-    box-shadow: 0 10px 28px rgba(17, 17, 19, .06), inset 0 1px 0 #fff;
-    backdrop-filter: blur(22px) saturate(125%) contrast(103%);
-    -webkit-backdrop-filter: blur(22px) saturate(125%) contrast(103%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, .28));
+    box-shadow: 0 10px 28px rgba(48, 72, 98, .08), inset 0 1px 0 rgba(255, 255, 255, .9);
+    backdrop-filter: blur(24px) saturate(110%);
+    -webkit-backdrop-filter: blur(24px) saturate(110%);
   }
   .mobile-switch { background: transparent; border-color: rgba(0, 0, 0, .05); }
   .preview-pane::before { display: none; }
